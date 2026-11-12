@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_09_120006) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_12_204051) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -33,6 +33,38 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_09_120006) do
     t.datetime "updated_at", null: false
     t.index ["lti_consumer_id", "context_id"], name: "index_lti_contexts_on_lti_consumer_id_and_context_id", unique: true
     t.index ["lti_consumer_id"], name: "index_lti_contexts_on_lti_consumer_id"
+  end
+
+  create_table "lti_deployments", force: :cascade do |t|
+    t.bigint "lti_registration_id", null: false
+    t.string "deployment_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lti_registration_id", "deployment_id"], name: "index_lti_deployments_on_lti_registration_id_and_deployment_id", unique: true
+    t.index ["lti_registration_id"], name: "index_lti_deployments_on_lti_registration_id"
+  end
+
+  create_table "lti_platforms", force: :cascade do |t|
+    t.string "issuer", null: false
+    t.string "name", null: false
+    t.string "auth_endpoint", null: false
+    t.string "token_endpoint", null: false
+    t.string "jwks_uri", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["issuer"], name: "index_lti_platforms_on_issuer", unique: true
+  end
+
+  create_table "lti_registrations", force: :cascade do |t|
+    t.bigint "lti_platform_id", null: false
+    t.string "client_id", null: false
+    t.text "public_key", null: false
+    t.text "private_key", null: false
+    t.string "kid", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lti_platform_id", "client_id"], name: "index_lti_registrations_on_lti_platform_id_and_client_id", unique: true
+    t.index ["lti_platform_id"], name: "index_lti_registrations_on_lti_platform_id"
   end
 
   create_table "lti_users", force: :cascade do |t|
@@ -82,6 +114,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_09_120006) do
   end
 
   add_foreign_key "lti_contexts", "lti_consumers"
+  add_foreign_key "lti_deployments", "lti_registrations"
+  add_foreign_key "lti_registrations", "lti_platforms"
   add_foreign_key "lti_users", "lti_consumers"
   add_foreign_key "polls", "lti_contexts"
   add_foreign_key "polls", "lti_users", column: "creator_id"
