@@ -7,6 +7,9 @@ Rails.application.routes.draw do
 
     get "me", to: "sessions#show", as: :me
 
+    get "jwks", to: "jwks#show", as: :jwks
+    get "tool_config", to: "tool_config#show", defaults: { format: :json }, as: :tool_config
+
     resources :polls, only: %i[index create] do
       resources :votes, only: :create
     end
