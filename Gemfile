@@ -25,7 +25,7 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
 
 # json 3.x removed the quirks_mode option that ActiveSupport 8.0 still passes.
-gem "json", "< 3"
+gem "json", "< 4"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
