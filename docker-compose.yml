@@ -9,7 +9,7 @@ services:
       RAILS_ENV: development
       INST_DOMAIN: ${INST_DOMAIN:-inseng.test}
       # Canvas signs the launch URL. This value must match what Canvas posts to.
-      PUBLIC_BASE_URL: http://quickpoll-1p1.${INST_DOMAIN:-inseng.test}
+      PUBLIC_BASE_URL: http://quickpoll-1p3.${INST_DOMAIN:-inseng.test}
     depends_on:
       - quickpoll_postgres
     volumes:
@@ -17,13 +17,13 @@ services:
       - bundled-gems:/home/docker/.gem/ruby
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.quickpoll-1p1.rule=Host(`quickpoll-1p1.${INST_DOMAIN:-inseng.test}`)'
+      - 'traefik.http.routers.quickpoll-1p3.rule=Host(`quickpoll-1p3.${INST_DOMAIN:-inseng.test}`)'
     networks:
       default:
       inst:
         aliases:
-          - 'quickpoll-1p1'
-          - 'quickpoll-1p1.${INST_DOMAIN:-inseng.test}'
+          - 'quickpoll-1p3'
+          - 'quickpoll-1p3.${INST_DOMAIN:-inseng.test}'
     logging:
       options:
         max-file: "5"

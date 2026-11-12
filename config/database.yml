@@ -8,13 +8,13 @@ default: &default
 
 development:
   <<: *default
-  database: quickpoll_1p1_development
+  database: quickpoll_1p3_development
 
 test:
   <<: *default
-  database: quickpoll_1p1_test
+  database: quickpoll_1p3_test
 
 production:
   <<: *default
-  database: quickpoll_1p1_production
+  database: quickpoll_1p3_production
   password: <%= ENV["QUICKPOLL_DATABASE_PASSWORD"] %>

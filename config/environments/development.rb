@@ -57,5 +57,5 @@ Rails.application.configure do
 
   # Canvas reaches this app through traefik under *.inseng.test (inst-cli).
   config.hosts << /.*\.#{Regexp.escape(ENV.fetch("INST_DOMAIN", "inseng.test"))}/
-  config.hosts << "quickpoll-1p1"
+  config.hosts << "quickpoll-1p3"
 end
