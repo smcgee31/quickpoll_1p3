@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_12_231446) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_13_002123) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,14 +25,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_12_231446) do
   end
 
   create_table "lti_contexts", force: :cascade do |t|
-    t.bigint "lti_consumer_id", null: false
+    t.bigint "lti_consumer_id"
     t.string "context_id", null: false
     t.string "title"
     t.string "label"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "lti_platform_id"
     t.index ["lti_consumer_id", "context_id"], name: "index_lti_contexts_on_lti_consumer_id_and_context_id", unique: true
     t.index ["lti_consumer_id"], name: "index_lti_contexts_on_lti_consumer_id"
+    t.index ["lti_platform_id", "context_id"], name: "index_lti_contexts_on_lti_platform_id_and_context_id", unique: true, where: "(context_id IS NOT NULL)"
+    t.index ["lti_platform_id"], name: "index_lti_contexts_on_lti_platform_id"
   end
 
   create_table "lti_deployments", force: :cascade do |t|
@@ -79,15 +82,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_12_231446) do
   end
 
   create_table "lti_users", force: :cascade do |t|
-    t.bigint "lti_consumer_id", null: false
-    t.string "lti1p1_user_id", null: false
+    t.bigint "lti_consumer_id"
+    t.string "lti1p1_user_id"
     t.string "lti1p3_sub"
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "lti_platform_id"
     t.index ["lti_consumer_id", "lti1p1_user_id"], name: "index_lti_users_on_lti_consumer_id_and_lti1p1_user_id", unique: true
     t.index ["lti_consumer_id", "lti1p3_sub"], name: "index_lti_users_on_lti_consumer_id_and_lti1p3_sub", unique: true, where: "(lti1p3_sub IS NOT NULL)"
     t.index ["lti_consumer_id"], name: "index_lti_users_on_lti_consumer_id"
+    t.index ["lti_platform_id", "lti1p3_sub"], name: "index_lti_users_on_lti_platform_id_and_lti1p3_sub", unique: true, where: "(lti1p3_sub IS NOT NULL)"
+    t.index ["lti_platform_id"], name: "index_lti_users_on_lti_platform_id"
   end
 
   create_table "polls", force: :cascade do |t|
@@ -125,10 +131,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_12_231446) do
   end
 
   add_foreign_key "lti_contexts", "lti_consumers"
+  add_foreign_key "lti_contexts", "lti_platforms"
   add_foreign_key "lti_deployments", "lti_registrations"
   add_foreign_key "lti_launch_states", "lti_registrations"
   add_foreign_key "lti_registrations", "lti_platforms"
   add_foreign_key "lti_users", "lti_consumers"
+  add_foreign_key "lti_users", "lti_platforms"
   add_foreign_key "polls", "lti_contexts"
   add_foreign_key "polls", "lti_users", column: "creator_id"
   add_foreign_key "used_nonces", "lti_consumers"

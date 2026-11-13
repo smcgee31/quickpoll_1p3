@@ -25,3 +25,23 @@ FactoryBot.define do
     sequence(:nonce) { |n| "nonce-#{n}" }
   end
 end
+
+# Rows that belong to a platform (1.3) instead of a consumer (1.1).
+# FactoryBot.modify adds a trait to a factory that lti.rb already defined.
+FactoryBot.modify do
+  factory :lti_user do
+    trait :lti1p3 do
+      lti_consumer { nil }
+      lti1p1_user_id { nil }
+      lti_platform
+      sequence(:lti1p3_sub) { |n| "sub-#{n}" }
+    end
+  end
+
+  factory :lti_context do
+    trait :lti1p3 do
+      lti_consumer { nil }
+      lti_platform
+    end
+  end
+end
