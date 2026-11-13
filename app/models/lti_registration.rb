@@ -1,6 +1,7 @@
 class LtiRegistration < ApplicationRecord
   belongs_to :lti_platform
   has_many :lti_deployments, dependent: :destroy
+  has_many :lti_launch_states, dependent: :destroy
   validates :client_id, presence: true, uniqueness: { scope: :lti_platform_id }
 
   before_validation :generate_keys, on: :create

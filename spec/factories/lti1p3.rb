@@ -17,3 +17,11 @@ FactoryBot.define do
     sequence(:deployment_id) { |n| "#{n}:8865aa05b4b79b64a91a86042e43af5ea8ae79eb" }
   end
 end
+
+FactoryBot.define do
+  factory :lti_launch_state do
+    lti_registration
+    sequence(:state) { |n| "state-#{n}" }
+    sequence(:nonce) { |n| "nonce-#{n}" }
+  end
+end

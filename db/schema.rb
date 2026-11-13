@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_12_204051) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_12_231446) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,6 +42,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_12_204051) do
     t.datetime "updated_at", null: false
     t.index ["lti_registration_id", "deployment_id"], name: "index_lti_deployments_on_lti_registration_id_and_deployment_id", unique: true
     t.index ["lti_registration_id"], name: "index_lti_deployments_on_lti_registration_id"
+  end
+
+  create_table "lti_launch_states", force: :cascade do |t|
+    t.bigint "lti_registration_id", null: false
+    t.string "state", null: false
+    t.string "nonce", null: false
+    t.datetime "used_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lti_registration_id"], name: "index_lti_launch_states_on_lti_registration_id"
+    t.index ["state"], name: "index_lti_launch_states_on_state", unique: true
   end
 
   create_table "lti_platforms", force: :cascade do |t|
@@ -115,6 +126,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_12_204051) do
 
   add_foreign_key "lti_contexts", "lti_consumers"
   add_foreign_key "lti_deployments", "lti_registrations"
+  add_foreign_key "lti_launch_states", "lti_registrations"
   add_foreign_key "lti_registrations", "lti_platforms"
   add_foreign_key "lti_users", "lti_consumers"
   add_foreign_key "polls", "lti_contexts"
