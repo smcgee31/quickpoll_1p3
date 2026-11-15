@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hackweek: One LTI Tool, Built Twice</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --ink: #1e293b;
+      --ink-body: #334155;
+      --ink-soft: #64748b;
+      --ink-faint: #94a3b8;
+      --rule: #e2e8f0;
+      --rule-soft: #f1f5f9;
+      --blue: #2563eb;
+      --purple: #7c3aed;
+      --teal: #0d9488;
+      --orange: #d97706;
+      --green: #16a34a;
+      --red: #dc2626;
+      --blue-tint: #eff6ff;
+      --purple-tint: #f5f3ff;
+      --teal-tint: #f0fdfa;
+      --orange-tint: #fffbeb;
+      --green-tint: #f0fdf4;
+      --red-tint: #fef2f2;
+      --hero-from: #1e40af;
+      --hero-to: #7c3aed;
+      --code-bg: #1e1e2e;
+      --code-ink: #cdd6f4;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --mono: 'SF Mono', 'Fira Code', ui-monospace, Menlo, Consolas, monospace;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --bar-h: 56px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-snap-type: y proximity;
+      scroll-padding-top: var(--bar-h);
+      scroll-behavior: smooth;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: var(--mono);
+      background: var(--rule-soft);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      color: var(--ink-body);
+      word-break: break-all;
+    }
+
+    p {
+      color: var(--ink-body);
+    }
+
+    /* Control bar */
+    .bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--bar-h);
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--rule);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px;
+    }
+
+    .bar .brand {
+      font-weight: 800;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .timeline {
+      flex: 1;
+      display: flex;
+      gap: 3px;
+      min-width: 120px;
+    }
+
+    .timeline a {
+      display: block;
+      text-decoration: none;
+      border-radius: 6px;
+      padding: 4px 6px;
+      background: var(--rule-soft);
+      border: 1px solid var(--rule);
+      color: var(--ink-soft);
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .timeline a.on {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink-body);
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .btn:focus-visible,
+    .timeline a:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 2px;
+    }
+
+    .btn[aria-pressed="true"] {
+      background: var(--blue-tint);
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .btn kbd {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--ink-faint);
+      margin-left: 4px;
+    }
+
+    @media (max-width: 760px) {
+
+      .brand,
+      .btn kbd {
+        display: none;
+      }
+
+      .bar {
+        gap: 8px;
+        padding: 0 10px;
+        justify-content: flex-end;
+      }
+
+      .timeline {
+        display: none;
+      }
+    }
+
+    /* Beats */
+    .beat {
+      min-height: 100vh;
+      padding: calc(var(--bar-h) + 28px) 24px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      scroll-snap-align: start;
+    }
+
+    .inner {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+
+    h2 {
+      font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .lede {
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      color: var(--ink-body);
+      margin-bottom: 22px;
+      max-width: 70ch;
+    }
+
+    /* Beat 1: hero */
+    .beat.hero {
+      background: linear-gradient(135deg, var(--hero-from) 0%, var(--hero-to) 100%);
+      color: #fff;
+      text-align: center;
+      align-items: center;
+    }
+
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 7vw, 5rem);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+
+    .hero .sub {
+      font-size: clamp(1.05rem, 2vw, 1.5rem);
+      color: rgba(255, 255, 255, 0.92);
+      max-width: 36ch;
+      margin: 0 auto 28px;
+    }
+
+    .vs-pills {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-bottom: 26px;
+      flex-wrap: wrap;
+    }
+
+    .vpill {
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-weight: 900;
+      padding: 10px 30px;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+    }
+
+    .vpill.v11 {
+      color: var(--orange);
+    }
+
+    .vpill.v13 {
+      color: var(--blue);
+    }
+
+    .vs-pills .x {
+      font-weight: 800;
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .scrollcue {
+      margin-top: 30px;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    /* Cards */
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    @media (max-width: 980px) {
+      .grid-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+
+      .grid-2,
+      .grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .edge-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      border-top: 4px solid var(--rule);
+    }
+
+    .ec-blue {
+      border-top-color: var(--blue);
+    }
+
+    .ec-purple {
+      border-top-color: var(--purple);
+    }
+
+    .ec-teal {
+      border-top-color: var(--teal);
+    }
+
+    .ec-orange {
+      border-top-color: var(--orange);
+    }
+
+    .ec-green {
+      border-top-color: var(--green);
+    }
+
+    .ec-red {
+      border-top-color: var(--red);
+    }
+
+    .ec-icon {
+      font-size: 1.8rem;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .ec-title {
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .ec-desc {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .ec-desc code {
+      word-break: normal;
+      overflow-wrap: anywhere;
+      font-size: 0.8em;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .b-blue {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .b-orange {
+      background: #ffedd5;
+      color: #c2410c;
+    }
+
+    .b-green {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .b-neutral {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .callout {
+      border-radius: 10px;
+      padding: 16px 20px;
+      border: 1px solid;
+      border-left-width: 4px;
+      font-size: 0.95rem;
+    }
+
+    .callout-warn {
+      background: var(--orange-tint);
+      border-color: #fed7aa;
+      color: #7c2d12;
+    }
+
+    .callout-warn strong {
+      color: #9a3412;
+    }
+
+    .callout-ok {
+      background: var(--green-tint);
+      border-color: #bbf7d0;
+      color: #14532d;
+    }
+
+    /* Beat 2: screenshots */
+    .shots {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .shots {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    figure.shot {
+      margin: 0;
+    }
+
+    figure.shot figcaption {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .frame {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .frame.over {
+      outline: 3px dashed var(--blue);
+      outline-offset: 3px;
+    }
+
+    .frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .chrome {
+      background: #e2e8f0;
+      padding: 7px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chrome i {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #94a3b8;
+      display: block;
+    }
+
+    .chrome span {
+      margin-left: 8px;
+      flex: 1;
+      background: #f8fafc;
+      border-radius: 5px;
+      padding: 2px 8px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--ink-soft);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .canvasview {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      min-height: 300px;
+    }
+
+    .cnav {
+      background: #394b58;
+      color: #fff;
+      padding: 12px 10px;
+      font-size: 0.72rem;
+      line-height: 2;
+    }
+
+    .cnav b {
+      display: block;
+      color: #fff;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .cnav div {
+      color: #cbd5e1;
+    }
+
+    .cnav div.here {
+      color: #fff;
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 4px;
+      padding: 0 6px;
+      margin: 0 -6px;
+    }
+
+    .page {
+      padding: 14px 16px;
+      font-family: "Times New Roman", Times, serif;
+      color: #000;
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .page p {
+      color: #000;
+      margin: 0 0 8px;
+      max-width: none;
+    }
+
+    .page ul {
+      margin: 0 0 10px 22px;
+    }
+
+    .page h4 {
+      font-size: 1.05rem;
+      margin: 10px 0 6px;
+    }
+
+    .page .inp {
+      display: block;
+      width: 100%;
+      max-width: 230px;
+      border: 1px solid #767676;
+      padding: 2px 4px;
+      font: inherit;
+      background: #fff;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .page .inp.ta {
+      height: 38px;
+    }
+
+    .page .sbtn {
+      font: inherit;
+      border: 1px solid #767676;
+      background: #efefef;
+      border-radius: 3px;
+      padding: 1px 8px;
+    }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+    }
+
+    /* Beat 3: diagrams */
+    figure.diagram {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      margin: 0;
+    }
+
+    figure.diagram figcaption {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+    }
+
+    figure.diagram svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    svg .t-h {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+      fill: #1e293b;
+    }
+
+    svg .t-s {
+      font-family: var(--mono);
+      font-size: 11px;
+      fill: #475569;
+    }
+
+    svg .t-d {
+      font-family: var(--sans);
+      font-size: 12px;
+      fill: #334155;
+    }
+
+    svg .bx {
+      fill: #ffffff;
+      stroke: #e2e8f0;
+      stroke-width: 1.5;
+    }
+
+    .trips {
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+
+    .trips.o {
+      background: #ffedd5;
+      color: #c2410c;
+    }
+
+    .trips.b {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    /* Beat 4: comparison */
+    .cmp {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .cmp>div {
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: clamp(0.88rem, 1.3vw, 1.05rem);
+    }
+
+    .cmp .h {
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 8px 16px;
+      text-align: left;
+    }
+
+    .cmp .h.o {
+      background: var(--orange);
+      color: #fff;
+    }
+
+    .cmp .h.b {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .cmp .h.n {
+      background: transparent;
+    }
+
+    .cmp .k {
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      font-weight: 800;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cmp .o {
+      background: var(--orange-tint);
+      border: 1px solid #fde68a;
+      color: #7c2d12;
+    }
+
+    .cmp .b {
+      background: var(--blue-tint);
+      border: 1px solid #bfdbfe;
+      color: #1e3a8a;
+    }
+
+    @media (max-width: 760px) {
+      .cmp {
+        grid-template-columns: 1fr;
+      }
+
+      .cmp .h.n {
+        display: none;
+      }
+
+      .cmp .k {
+        margin-top: 10px;
+      }
+    }
+
+
+    /* Beat 5: step-by-step launch */
+    figure.diagram.seq {
+      overflow-x: auto;
+      cursor: pointer;
+    }
+
+    figure.diagram.seq svg {
+      min-width: 860px;
+    }
+
+    .seq .st {
+      transition: opacity 0.45s ease;
+    }
+
+    .seq.anim .st {
+      opacity: 0;
+    }
+
+    .seq.anim .st.on {
+      opacity: 1;
+    }
+
+    .seq.anim .st.now .ln {
+      stroke-width: 4;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .seq.anim .st {
+        opacity: 1;
+        transition: none;
+      }
+    }
+
+    @media print {
+      .seq.anim .st {
+        opacity: 1;
+      }
+    }
+
+    .ver {
+      display: inline-block;
+      font-size: 0.82em;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      padding: 0.1em 0.5em;
+      border-radius: 0.55em;
+      color: #fff;
+      vertical-align: baseline;
+      margin-right: 0.3em;
+      box-shadow: var(--shadow);
+    }
+
+    .ver.v11 {
+      background: var(--orange);
+    }
+
+    .ver.v13 {
+      background: var(--blue);
+    }
+
+    /* Beat 2: real screenshots that step through */
+  .demo { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 22px; align-items: center; }
+  @media (max-width: 860px) { .demo { grid-template-columns: 1fr; } }
+  .demo-steps { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .dstep { width: 100%; display: flex; gap: 12px; align-items: flex-start; text-align: left; font: inherit; color: var(--ink-body); background: var(--surface); border: 2px solid var(--rule); border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: border-color 0.3s, background 0.3s, box-shadow 0.3s; }
+  .dstep b { display: block; font-size: 1.02rem; color: var(--ink); }
+  .dstep small { display: block; font-size: 0.82rem; color: var(--ink-soft); line-height: 1.4; margin-top: 2px; }
+  .dstep .dn { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--rule-soft); color: var(--ink-soft); font-weight: 800; display: flex; align-items: center; justify-content: center; transition: background 0.3s, color 0.3s; }
+  .dstep.on { border-color: var(--blue); background: var(--blue-tint); box-shadow: var(--shadow-sm); }
+  .dstep.on .dn { background: var(--blue); color: #fff; }
+  .dstep:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .stage { display: grid; border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: var(--shadow); cursor: pointer; }
+  .stage img { grid-area: 1 / 1; width: 100%; height: auto; display: block; opacity: 0; transition: opacity 0.6s ease; }
+  .stage img.on { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .stage img { transition: none; } }
+  @media print { .stage img { opacity: 1; grid-area: auto; margin-bottom: 8px; } .stage { display: block; } }
+
+  /* Closing slide */
+    .closing .endcard {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 14px;
+      padding: 16px 28px;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    .closing .sub { max-width: none; white-space: nowrap; }
+  @media (max-width: 760px) { .closing .sub { white-space: normal; } }
+  .closing .endlabel {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 6px;
+    }
+
+    .closing .endrepo {
+      font-family: var(--mono);
+      font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+      color: #fff;
+      line-height: 1.8;
+      word-break: break-all;
+    }
+
+    .closing .scrollcue {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 22px;
+    }
+
+    /* Beat 7 (old takeaway styles, now unused) */
+    .big {
+      font-size: clamp(1.8rem, 4.4vw, 3.4rem);
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1.12;
+      margin-bottom: 26px;
+    }
+
+    .big em {
+      font-style: normal;
+      color: var(--blue);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 760px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .stat {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 16px 18px;
+      border-left: 6px solid var(--blue);
+    }
+
+    .stat:nth-child(2) {
+      border-left-color: var(--purple);
+    }
+
+    .stat:nth-child(3) {
+      border-left-color: var(--teal);
+    }
+
+    .stat:nth-child(4) {
+      border-left-color: var(--green);
+    }
+
+    .stat .n {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      line-height: 1;
+      color: var(--ink);
+    }
+
+    .stat .l {
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      margin-top: 6px;
+    }
+
+    .next {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .next li {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--ink-body);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nexthead {
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+      margin: 0 0 8px;
+    }
+
+    /* Speaker script */
+    .script {
+      display: none;
+      margin-top: 22px;
+      border-radius: 10px;
+      padding: 14px 18px;
+      background: var(--blue-tint);
+      border: 1px solid #bfdbfe;
+      border-left: 4px solid var(--blue);
+      color: #1e3a8a;
+    }
+
+    body.show-script .script {
+      display: block;
+    }
+
+    .script .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #1d4ed8;
+      margin-bottom: 6px;
+    }
+
+    .script p {
+      color: #1e3a8a;
+      font-size: 1.02rem;
+      max-width: 80ch;
+    }
+
+    .pace.fast {
+      color: var(--red);
+    }
+
+    body.rec .bar,
+    body.rec .script,
+    body.rec .hint {
+      display: none !important;
+    }
+
+    body.rec .beat {
+      padding-top: 28px;
+    }
+
+    @media print {
+      html {
+        scroll-snap-type: none;
+      }
+
+      .bar,
+      .hint {
+        display: none;
+      }
+
+      .beat {
+        min-height: auto;
+        page-break-after: always;
+        padding-top: 24px;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .beat.hero {
+        background: var(--hero-from);
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .script {
+        display: block;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="bar" id="bar">
+    <span class="brand">Hackweek demo</span>
+    <nav class="timeline" aria-label="Beats">
+      <a href="#b1" data-b="1">Intro 0:00</a>
+      <a href="#b2" data-b="2">QuickPoll 0:03</a>
+      <a href="#b3" data-b="3">Launch 0:11</a>
+      <a href="#b4" data-b="4">Side by side 0:23</a>
+      <a href="#b5" data-b="5">1.1 launch 0:29</a>
+      <a href="#b6" data-b="6">1.3 launch 0:38</a>
+      <a href="#b7" data-b="7">Close 0:53</a>
+    </nav>
+    <div class="btns">
+      <button class="btn" id="btn-script" aria-pressed="false"
+        title="Show the speaker script (S)">Script<kbd>S</kbd></button>
+      <button class="btn" id="btn-auto" aria-pressed="false"
+        title="Scroll through the beats on the 60 second clock (A)">Auto-scroll<kbd>A</kbd></button>
+      <button class="btn" id="btn-rec"
+        title="Hide all controls so you can record (H). Press H or Esc to bring them back.">Record
+        view<kbd>H</kbd></button>
+    </div>
+  </header>
+
+  <!-- BEAT 1 : 0:00 to 0:03 -->
+  <section class="beat hero" id="b1" data-start="0" data-sec="3">
+    <div class="inner">
+      <h1>One LTI tool.<br>Built twice.</h1>
+      <p class="sub" style="color:rgba(255,255,255,0.92);margin-left:auto;margin-right:auto;">What I
+        learned in hackweek about how LTI 1.1 and LTI 1.3 really differ.</p>
+      <div class="vs-pills" aria-label="LTI 1.1 against LTI 1.3">
+        <span class="vpill v11">LTI 1.1</span><span class="x">vs</span><span class="vpill v13">LTI
+          1.3</span>
+      </div>
+      <div class="chips"><span class="chip">Hackweek</span><span class="chip">QuickPoll</span><span
+          class="chip">Ruby on Rails</span><span class="chip">Local Canvas</span></div>
+      <p class="scrollcue">Scroll down</p>
+      <div class="script" aria-label="Speaker script">
+        <div class="meta"><span>Say (about 3 s)</span><span class="pace"></span></div>
+        <p>I built one LTI tool twice.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEAT 2 : 0:03 to 0:11 -->
+  <section class="beat" id="b2" data-start="3" data-sec="8">
+    <div class="inner">
+      <h2>QuickPoll: a poll inside Canvas</h2>
+      <p class="lede">Teachers write a poll. Students vote once. Both versions run side by side in my local Canvas.</p>
+      <div class="demo" id="demo" data-gap="2600">
+        <ol class="demo-steps">
+          <li><button type="button" class="dstep on" data-i="0"><span class="dn">1</span><span><b>Teacher writes a poll</b><small>A question and the options, then Create Poll</small></span></button></li>
+          <li><button type="button" class="dstep" data-i="1"><span class="dn">2</span><span><b>Student votes</b><small>One choice, one Vote button</small></span></button></li>
+          <li><button type="button" class="dstep" data-i="2"><span class="dn">3</span><span><b>Results appear</b><small>You see your vote and the counts. A second vote is refused.</small></span></button></li>
+        </ol>
+        <div class="stage" title="Click to go to the next screen">
+          <img class="on" src="hackweek-demo-img/1-teacher-new-poll.png" alt="The QuickPoll 1.3 page in Canvas as a teacher: a New poll form with a question and three options.">
+          <img src="hackweek-demo-img/2-student-vote.png" alt="The QuickPoll 1.3 page in Canvas as a student: the question Which day should we hold the quiz, with three choices and a Vote button.">
+          <img src="hackweek-demo-img/3-student-results.png" alt="The QuickPoll 1.3 page in Canvas after voting: You voted Thursday, with the counts for each option.">
+        </div>
+      </div>
+      <p class="hint" style="margin-top:10px;">Screens from the 1.3 version, in a local Canvas with test users.</p>
+      <div class="script" aria-label="Speaker script">
+        <div class="meta"><span>Say (about 8 s)</span><span class="pace"></span></div>
+        <p>QuickPoll: a teacher posts a poll in Canvas, and students vote once and see the results.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEAT 3 : 0:11 to 0:23 -->
+  <section class="beat" id="b3" data-start="11" data-sec="12">
+    <div class="inner">
+      <h2>The launch is where they differ most</h2>
+      <p class="lede">A launch is what happens when you click the tool in Canvas. 1.1 proves
+        identity with a shared secret. 1.3 proves it with a signed token.</p>
+      <div class="grid grid-2">
+        <figure class="diagram">
+          <figcaption><span class="trips o">1 trip</span> LTI 1.1</figcaption>
+          <svg viewBox="0 0 480 330" role="img"
+            aria-label="LTI 1.1 launch: Canvas sends one signed form POST to the tool. The tool re-computes the signature with the shared secret.">
+            <defs>
+              <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+                orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#d97706" />
+              </marker>
+            </defs>
+            <rect class="bx" x="20" y="8" width="140" height="40" rx="10" /><text class="t-h" x="90"
+              y="33" text-anchor="middle">Canvas</text>
+            <rect class="bx" x="320" y="8" width="140" height="40" rx="10" /><text class="t-h"
+              x="390" y="33" text-anchor="middle">QuickPoll</text>
+            <line x1="90" y1="48" x2="90" y2="320" stroke="#cbd5e1" stroke-width="1.5"
+              stroke-dasharray="5 4" />
+            <line x1="390" y1="48" x2="390" y2="320" stroke="#cbd5e1" stroke-width="1.5"
+              stroke-dasharray="5 4" />
+            <line x1="92" y1="110" x2="386" y2="110" stroke="#d97706" stroke-width="2.5"
+              marker-end="url(#ao)" />
+            <text class="t-h" x="240" y="98" text-anchor="middle">1. POST the launch form</text>
+            <text class="t-s" x="240" y="132" text-anchor="middle">user, course, roles +
+              oauth_signature</text>
+            <rect x="130" y="170" width="330" height="78" rx="10" fill="#fffbeb" stroke="#d97706"
+              stroke-width="1.5" />
+            <text class="t-h" x="295" y="196" text-anchor="middle">Tool re-computes the
+              signature</text>
+            <text class="t-d" x="295" y="215" text-anchor="middle">using the shared secret.</text>
+            <text class="t-d" x="295" y="233" text-anchor="middle">Same answer means Canvas sent
+              it.</text>
+            <rect x="130" y="270" width="330" height="40" rx="10" fill="#f0fdf4" stroke="#16a34a"
+              stroke-width="1.5" />
+            <text class="t-h" x="295" y="295" text-anchor="middle">Done. One request.</text>
+          </svg>
+        </figure>
+        <figure class="diagram">
+          <figcaption><span class="trips b">2 trips</span> LTI 1.3</figcaption>
+          <svg viewBox="0 0 480 330" role="img"
+            aria-label="LTI 1.3 launch: Canvas sends a login request, the tool redirects back with state and nonce, Canvas posts a signed id_token, and the tool fetches Canvas public keys to check it.">
+            <defs>
+              <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+                orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#2563eb" />
+              </marker>
+              <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+                orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#94a3b8" />
+              </marker>
+            </defs>
+            <rect class="bx" x="20" y="8" width="140" height="40" rx="10" /><text class="t-h" x="90"
+              y="33" text-anchor="middle">Canvas</text>
+            <rect class="bx" x="320" y="8" width="140" height="40" rx="10" /><text class="t-h"
+              x="390" y="33" text-anchor="middle">QuickPoll</text>
+            <line x1="90" y1="48" x2="90" y2="325" stroke="#cbd5e1" stroke-width="1.5"
+              stroke-dasharray="5 4" />
+            <line x1="390" y1="48" x2="390" y2="325" stroke="#cbd5e1" stroke-width="1.5"
+              stroke-dasharray="5 4" />
+            <line x1="92" y1="82" x2="386" y2="82" stroke="#2563eb" stroke-width="2.5"
+              marker-end="url(#ab)" />
+            <text class="t-h" x="240" y="72" text-anchor="middle">1. Login request</text>
+            <text class="t-s" x="240" y="98" text-anchor="middle">iss, client_id, login_hint</text>
+            <line x1="388" y1="130" x2="94" y2="130" stroke="#2563eb" stroke-width="2.5"
+              marker-end="url(#ab)" />
+            <text class="t-h" x="240" y="120" text-anchor="middle">2. Redirect back, with state +
+              nonce</text>
+            <text class="t-s" x="240" y="146" text-anchor="middle">tool saves both first</text>
+            <line x1="92" y1="178" x2="386" y2="178" stroke="#2563eb" stroke-width="2.5"
+              marker-end="url(#ab)" />
+            <text class="t-h" x="240" y="168" text-anchor="middle">3. POST id_token</text>
+            <text class="t-s" x="240" y="194" text-anchor="middle">a signed JWT (RS256)</text>
+            <line x1="388" y1="228" x2="94" y2="228" stroke="#94a3b8" stroke-width="2"
+              stroke-dasharray="6 4" marker-end="url(#ag)" />
+            <text class="t-h" x="240" y="218" text-anchor="middle">4. Fetch Canvas public
+              keys</text>
+            <text class="t-s" x="240" y="244" text-anchor="middle">server to server</text>
+            <rect x="130" y="266" width="330" height="52" rx="10" fill="#eff6ff" stroke="#2563eb"
+              stroke-width="1.5" />
+            <text class="t-h" x="295" y="288" text-anchor="middle">Tool checks the signature + 17
+              more</text>
+            <text class="t-d" x="295" y="306" text-anchor="middle">18 checks in total, then you are
+              in.</text>
+          </svg>
+        </figure>
+      </div>
+      <div class="script" aria-label="Speaker script">
+        <div class="meta"><span>Say (about 12 s)</span><span class="pace"></span></div>
+        <p>The big difference is the launch. 1.1 sends one form, signed with a shared secret. 1.3 sends a signed token, checked with Canvas's public key.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEAT 4 : 0:23 to 0:29 -->
+  <section class="beat" id="b4" data-start="23" data-sec="6">
+    <div class="inner">
+      <h2>Five things that changed</h2>
+      <p class="lede">Same app, same polls. The trust model moved, and everything around it moved
+        too.</p>
+      <div class="cmp" role="table" aria-label="LTI 1.1 against LTI 1.3">
+        <div class="h n" role="columnheader"></div>
+        <div class="h o" role="columnheader">LTI 1.1</div>
+        <div class="h b" role="columnheader">LTI 1.3</div>
+        <div class="k" role="rowheader"><span>&#128273;</span> Trust</div>
+        <div class="o" role="cell">A secret both sides keep</div>
+        <div class="b" role="cell">Canvas's public key, fetched by URL</div>
+        <div class="k" role="rowheader"><span>&#128682;</span> Launch</div>
+        <div class="o" role="cell">One signed form post</div>
+        <div class="b" role="cell">Two trips: login, then a signed token</div>
+        <div class="k" role="rowheader"><span>&#128736;</span> Install</div>
+        <div class="o" role="cell">Paste a key, a secret, and XML</div>
+        <div class="b" role="cell">Tool serves JSON. Canvas gives a client ID and a deployment ID
+        </div>
+        <div class="k" role="rowheader"><span>&#127917;</span> Roles</div>
+        <div class="o" role="cell">Comma separated list of roles</div>
+        <div class="b" role="cell">A list of URIs. The role name sits after the
+          #</div>
+        <div class="k" role="rowheader"><span>&#129706;</span> Identity</div>
+        <div class="o" role="cell">A 40-character user_id</div>
+        <div class="b" role="cell">A new UUID, plus a claim that carries the old user_id</div>
+      </div>
+      <div class="script" aria-label="Speaker script">
+        <div class="meta"><span>Say (about 6 s)</span><span class="pace"></span></div>
+        <p>Trust moves to a public key. Install moves to a JSON config.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEAT 5 : 0:29 to 0:38 (LTI 1.1 launch) -->
+  <section class="beat" id="b5" data-start="29" data-sec="9">
+    <div class="inner">
+      <h2><span class="ver v11">LTI 1.1</span> Inside the launch</h2>
+      <p class="lede">One click in my local Canvas, four steps. Canvas signs a form, the browser
+        carries it, and the tool checks it. The tool never calls Canvas.</p>
+      <figure class="diagram seq" data-gap="1700" title="Click to replay">
+        <svg viewBox="0 0 1060 430" role="img"
+          aria-label="One LTI 1.1 launch in four steps. The browser clicks the link, Canvas answers with a page that holds a signed form, the browser posts the form to the tool, and the tool checks it and redirects to the poll page. The tool never calls Canvas.">
+          <defs>
+            <marker id="sq11-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7"
+              markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#475569" />
+            </marker>
+          </defs>
+          <line x1="110" y1="48" x2="110" y2="426" stroke="#cbd5e1" stroke-width="2"
+            stroke-dasharray="5 5" />
+          <rect x="22" y="4" width="176" height="44" rx="10" fill="#f0fdfa" stroke="#0d9488"
+            stroke-width="2" /><text class="t-h" x="110" y="23"
+            text-anchor="middle">Browser</text><text class="t-s" x="110" y="39"
+            text-anchor="middle">inside the Canvas iframe</text>
+          <line x1="460" y1="48" x2="460" y2="426" stroke="#cbd5e1" stroke-width="2"
+            stroke-dasharray="5 5" />
+          <rect x="372" y="4" width="176" height="44" rx="10" fill="#fffbeb" stroke="#d97706"
+            stroke-width="2" /><text class="t-h" x="460" y="23"
+            text-anchor="middle">Canvas</text><text class="t-s" x="460" y="39"
+            text-anchor="middle">the platform</text>
+          <line x1="810" y1="48" x2="810" y2="426" stroke="#cbd5e1" stroke-width="2"
+            stroke-dasharray="5 5" />
+          <rect x="722" y="4" width="176" height="44" rx="10" fill="#eff6ff" stroke="#2563eb"
+            stroke-width="2" /><text class="t-h" x="810" y="23"
+            text-anchor="middle">QuickPoll</text><text class="t-s" x="810" y="39"
+            text-anchor="middle">the tool</text>
+          <g class="st" data-s="1">
+            <line class="ln" x1="116" y1="96" x2="454" y2="96" stroke="#475569" stroke-width="2.5"
+              marker-end="url(#sq11-g)" /><text class="t-d" x="285.0" y="78" text-anchor="middle"
+              style="font-weight:700">1 Click QuickPoll 1.1 in the course menu</text><text
+              class="t-s" x="285.0" y="91" text-anchor="middle">GET
+              /courses/1/external_tools/&lt;id&gt;</text>
+          </g>
+          <g class="st" data-s="2">
+            <line class="ln" x1="454" y1="176" x2="116" y2="176" stroke="#475569" stroke-width="2.5"
+              stroke-dasharray="6 4" marker-end="url(#sq11-g)" /><text class="t-d" x="285.0" y="158"
+              text-anchor="middle" style="font-weight:700">2 Canvas answers with a page that holds a
+              signed form</text><text class="t-s" x="285.0" y="171" text-anchor="middle">about 30
+              fields, plus oauth_signature</text>
+            <rect x="484" y="122" width="290" height="84" rx="8" fill="#fffbeb" stroke="#d97706"
+              stroke-width="1.5" /><text class="t-l" x="629" y="142" text-anchor="middle"
+              fill="#d97706">Canvas signs the form</text><text class="t-d" x="629" y="161"
+              text-anchor="middle">HMAC-SHA1 with the shared secret</text><text class="t-d" x="629"
+              y="178" text-anchor="middle">adds a timestamp and a nonce</text><text class="t-d"
+              x="629" y="195" text-anchor="middle">the page submits itself</text>
+          </g>
+          <g class="st" data-s="3">
+            <line class="ln" x1="116" y1="256" x2="804" y2="256" stroke="#475569" stroke-width="2.5"
+              marker-end="url(#sq11-g)" /><text class="t-d" x="460.0" y="238" text-anchor="middle"
+              style="font-weight:700">3 Browser posts the whole form to the tool</text><text
+              class="t-s" x="460.0" y="251" text-anchor="middle">POST /lti/launch</text>
+          </g>
+          <g class="st" data-s="4">
+            <line class="ln" x1="804" y1="336" x2="116" y2="336" stroke="#475569" stroke-width="2.5"
+              stroke-dasharray="6 4" marker-end="url(#sq11-g)" /><text class="t-d" x="460.0" y="318"
+              text-anchor="middle" style="font-weight:700">4 Tool redirects to the poll page
+              (303)</text><text class="t-s" x="460.0" y="331" text-anchor="middle">GET
+              /lti/polls</text>
+            <rect x="828" y="262" width="226" height="148" rx="8" fill="#eff6ff" stroke="#2563eb"
+              stroke-width="1.5" /><text class="t-l" x="941" y="283" text-anchor="middle"
+              fill="#2563eb">Tool checks the launch</text><text class="t-d" x="941" y="305"
+              text-anchor="middle">1 Known consumer key</text><text class="t-d" x="941" y="323"
+              text-anchor="middle">2 Signature matches</text><text class="t-d" x="941" y="341"
+              text-anchor="middle">3 Timestamp within 5 min</text><text class="t-d" x="941" y="359"
+              text-anchor="middle">4 Nonce never seen before</text><text class="t-d" x="941" y="381"
+              text-anchor="middle">Then it saves the person</text><text class="t-d" x="941" y="398"
+              text-anchor="middle">and the course.</text>
+          </g>
+        </svg>
+      </figure>
+      <p class="hint">Click the diagram to replay the steps.</p>
+      <div class="script" aria-label="Speaker script">
+        <div class="meta"><span>Say (about 9 s)</span><span class="pace"></span></div>
+        <p>In 1.1, Canvas signs one form with the shared secret. The browser posts it, and my tool re-checks the signature.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEAT 6 : 0:38 to 0:53 (LTI 1.3 launch) -->
+  <section class="beat" id="b6" data-start="38" data-sec="15">
+    <div class="inner">
+      <h2><span class="ver v13">LTI 1.3</span> Inside the launch</h2>
+      <p class="lede">One click in my local Canvas, nine steps. Solid arrows are requests, dashed
+        arrows are answers. Step 8 is the only request the browser never sees.</p>
+      <figure class="diagram seq" data-gap="1450" title="Click to replay">
+        <svg viewBox="0 0 1060 520" role="img"
+          aria-label="One real LTI 1.3 launch in nine steps. The browser starts a login at the tool, the tool redirects to Canvas, Canvas returns a signed id_token in an auto-submitting form, the browser posts it to the tool, the tool downloads the Canvas public keys and checks the token, then redirects to the poll page.">
+          <defs>
+            <marker id="sq-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+              orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#475569" />
+            </marker>
+            <marker id="sq-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+              orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#2563eb" />
+            </marker>
+          </defs>
+          <line x1="110" y1="48" x2="110" y2="516" stroke="#cbd5e1" stroke-width="2"
+            stroke-dasharray="5 5" />
+          <rect x="22" y="4" width="176" height="44" rx="10" fill="#f0fdfa" stroke="#0d9488"
+            stroke-width="2" /><text class="t-h" x="110" y="23"
+            text-anchor="middle">Browser</text><text class="t-s" x="110" y="39"
+            text-anchor="middle">inside the Canvas iframe</text>
+          <line x1="460" y1="48" x2="460" y2="516" stroke="#cbd5e1" stroke-width="2"
+            stroke-dasharray="5 5" />
+          <rect x="372" y="4" width="176" height="44" rx="10" fill="#fffbeb" stroke="#d97706"
+            stroke-width="2" /><text class="t-h" x="460" y="23"
+            text-anchor="middle">Canvas</text><text class="t-s" x="460" y="39"
+            text-anchor="middle">the platform</text>
+          <line x1="810" y1="48" x2="810" y2="516" stroke="#cbd5e1" stroke-width="2"
+            stroke-dasharray="5 5" />
+          <rect x="722" y="4" width="176" height="44" rx="10" fill="#eff6ff" stroke="#2563eb"
+            stroke-width="2" /><text class="t-h" x="810" y="23"
+            text-anchor="middle">QuickPoll</text><text class="t-s" x="810" y="39"
+            text-anchor="middle">the tool</text>
+          <g class="st" data-s="1">
+            <line class="ln" x1="116" y1="96" x2="454" y2="96" stroke="#475569" stroke-width="2.5"
+              marker-end="url(#sq-g)" /><text class="t-d" x="285.0" y="78" text-anchor="middle"
+              style="font-weight:700">1 Click QuickPoll in the course menu</text><text class="t-s"
+              x="285.0" y="91" text-anchor="middle">GET /courses/1/external_tools/21</text>
+          </g>
+          <g class="st" data-s="2">
+            <line class="ln" x1="454" y1="146" x2="116" y2="146" stroke="#475569" stroke-width="2.5"
+              stroke-dasharray="6 4" marker-end="url(#sq-g)" /><text class="t-d" x="285.0" y="128"
+              text-anchor="middle" style="font-weight:700">2 Canvas sends the browser to the tool's
+              login URL</text><text class="t-s" x="285.0" y="141" text-anchor="middle">iss,
+              client_id, login_hint, lti_message_hint</text>
+          </g>
+          <g class="st" data-s="3">
+            <line class="ln" x1="116" y1="196" x2="804" y2="196" stroke="#475569" stroke-width="2.5"
+              marker-end="url(#sq-g)" /><text class="t-d" x="460.0" y="178" text-anchor="middle"
+              style="font-weight:700">3 Browser starts the login at the tool</text><text class="t-s"
+              x="460.0" y="191" text-anchor="middle">GET or POST /lti/login</text>
+            <rect x="828" y="204" width="226" height="54" rx="8" fill="#f5f3ff" stroke="#7c3aed"
+              stroke-width="1.5" /><text class="t-l" x="941" y="224" text-anchor="middle"
+              fill="#7c3aed">Tool saves state + nonce</text><text class="t-d" x="941" y="243"
+              text-anchor="middle">row in lti_launch_states</text>
+          </g>
+          <g class="st" data-s="4">
+            <line class="ln" x1="804" y1="246" x2="116" y2="246" stroke="#475569" stroke-width="2.5"
+              stroke-dasharray="6 4" marker-end="url(#sq-g)" /><text class="t-d" x="460.0" y="228"
+              text-anchor="middle" style="font-weight:700">4 Tool redirects back to Canvas
+              (302)</text><text class="t-s" x="460.0" y="241" text-anchor="middle">state, nonce,
+              redirect_uri, client_id</text>
+          </g>
+          <g class="st" data-s="5">
+            <line class="ln" x1="116" y1="296" x2="454" y2="296" stroke="#475569" stroke-width="2.5"
+              marker-end="url(#sq-g)" /><text class="t-d" x="285.0" y="278" text-anchor="middle"
+              style="font-weight:700">5 Browser asks Canvas to authorize</text><text class="t-s"
+              x="285.0" y="291" text-anchor="middle">authorize_redirect, then authorize</text>
+            <rect x="484" y="292" width="290" height="70" rx="8" fill="#fffbeb" stroke="#d97706"
+              stroke-width="1.5" /><text class="t-l" x="629" y="312" text-anchor="middle"
+              fill="#d97706">Canvas builds the id_token</text><text class="t-d" x="629" y="330"
+              text-anchor="middle">checks client_id and redirect_uri</text><text class="t-d" x="629"
+              y="347" text-anchor="middle">signs a JWT with its private key</text>
+          </g>
+          <g class="st" data-s="6">
+            <line class="ln" x1="454" y1="346" x2="116" y2="346" stroke="#475569" stroke-width="2.5"
+              stroke-dasharray="6 4" marker-end="url(#sq-g)" /><text class="t-d" x="285.0" y="328"
+              text-anchor="middle" style="font-weight:700">6 Canvas returns an auto-submitting
+              form</text><text class="t-s" x="285.0" y="341" text-anchor="middle">id_token +
+              state</text>
+          </g>
+          <g class="st" data-s="7">
+            <line class="ln" x1="116" y1="396" x2="804" y2="396" stroke="#475569" stroke-width="2.5"
+              marker-end="url(#sq-g)" /><text class="t-d" x="460.0" y="378" text-anchor="middle"
+              style="font-weight:700">7 Browser posts the token to the tool</text><text class="t-s"
+              x="460.0" y="391" text-anchor="middle">POST /lti/launch</text>
+          </g>
+          <g class="st" data-s="8">
+            <line class="ln" x1="804" y1="446" x2="466" y2="446" stroke="#2563eb" stroke-width="2.5"
+              marker-end="url(#sq-b)" /><text class="t-d" x="635.0" y="428" text-anchor="middle"
+              style="font-weight:700">8 Tool downloads the Canvas public keys</text><text
+              class="t-s" x="635.0" y="441" text-anchor="middle">GET /api/lti/security/jwks (no
+              browser)</text>
+            <rect x="828" y="414" width="226" height="98" rx="8" fill="#eff6ff" stroke="#2563eb"
+              stroke-width="1.5" /><text class="t-l" x="941" y="434" text-anchor="middle"
+              fill="#2563eb">Tool checks the token</text><text class="t-d" x="941" y="453"
+              text-anchor="middle">state, signature, iss, aud,</text><text class="t-d" x="941"
+              y="470" text-anchor="middle">exp, iat, nonce, version,</text><text class="t-d" x="941"
+              y="487" text-anchor="middle">deployment id. Then it saves</text><text class="t-d"
+              x="941" y="504" text-anchor="middle">the person and the course.</text>
+          </g>
+          <g class="st" data-s="9">
+            <line class="ln" x1="804" y1="496" x2="116" y2="496" stroke="#475569" stroke-width="2.5"
+              stroke-dasharray="6 4" marker-end="url(#sq-g)" /><text class="t-d" x="460.0" y="478"
+              text-anchor="middle" style="font-weight:700">9 Tool redirects to the poll page
+              (303)</text><text class="t-s" x="460.0" y="491" text-anchor="middle">GET
+              /lti/polls</text>
+          </g>
+        </svg>
+      </figure>
+      <p class="hint">Click the diagram to replay the steps.</p>
+      <div class="script" aria-label="Speaker script">
+        <div class="meta"><span>Say (about 15 s)</span><span class="pace"></span></div>
+        <p>Here's one real 1.3 launch. Canvas starts the login. My tool saves a nonce and sends the browser back. Canvas signs a token and posts it. My tool downloads Canvas's public keys and checks it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEAT 7 : 0:53 to 0:57 (closing) -->
+  <section class="beat hero closing" id="b7" data-start="53" data-sec="4">
+    <div class="inner">
+      <h1>Thank you for watching</h1>
+      <p class="sub" style="color:rgba(255,255,255,0.92);margin-left:auto;margin-right:auto;">Same
+        poll tool - Two LTI versions - One local Canvas.</p>
+      <div class="vs-pills" aria-label="LTI 1.1 and LTI 1.3">
+        <span class="vpill v11">LTI 1.1</span><span class="x">and</span><span class="vpill v13">LTI
+          1.3</span>
+      </div>
+      <div class="endcard">
+        <div class="endlabel">Code and walkthroughs</div>
+        <div class="endrepo">github.com/smcgee31/quickpoll_1p1</div>
+        <div class="endrepo">github.com/smcgee31/quickpoll_1p3</div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (() => {
+      var beats = Array.prototype.slice.call(document.querySelectorAll('.beat'));
+      var links = Array.prototype.slice.call(document.querySelectorAll('.timeline a'));
+      var body = document.body;
+      var timers = [];
+
+      // Pace check: words in each script against the seconds the beat gets.
+      var totalWords = 0;
+      beats.forEach((b) => {
+        var p = b.querySelector('.script p');
+        var out = b.querySelector('.pace');
+        if (!p || !out) return;
+        var words = p.textContent.trim().split(/\s+/).length;
+        var sec = Number(b.dataset.sec);
+        totalWords += words;
+        var pace = words / sec;
+        out.textContent = words + ' words in ' + sec + ' s = ' + pace.toFixed(1) + ' words/s';
+        if (pace > 2.8) { out.classList.add('fast'); out.textContent += ' (fast)'; }
+      });
+      var tot = document.getElementById('b6').querySelector('.meta');
+      if (tot) {
+        var t = document.createElement('span');
+        var totalSec = beats.reduce(function (n, b) { return n + Number(b.dataset.sec); }, 0);
+        t.textContent = 'Whole script: ' + totalWords + ' words in ' + totalSec + ' s. Calm pace is about 2.3 words/s, so aim for ' + Math.round(totalSec * 2.3) + ' or fewer.';
+        tot.appendChild(t);
+      }
+
+      function setActive(i) {
+        links.forEach((a, n) => { a.classList.toggle('on', n === i); });
+      }
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => { if (e.isIntersecting) setActive(beats.indexOf(e.target)); });
+        }, { rootMargin: '-45% 0px -45% 0px' });
+        beats.forEach((b) => { io.observe(b); });
+      }
+      setActive(0);
+
+      function current() {
+        var y = window.scrollY + window.innerHeight * 0.4, idx = 0;
+        beats.forEach((b, i) => { if (b.offsetTop <= y) idx = i; });
+        return idx;
+      }
+      function go(i) {
+        i = Math.max(0, Math.min(beats.length - 1, i));
+        beats[i].scrollIntoView({ block: 'start' });
+      }
+
+      var btnScript = document.getElementById('btn-script');
+      var btnAuto = document.getElementById('btn-auto');
+      var btnRec = document.getElementById('btn-rec');
+
+      function toggleScript() {
+        var on = body.classList.toggle('show-script');
+        btnScript.setAttribute('aria-pressed', String(on));
+      }
+      function stopAuto() {
+        timers.forEach(clearTimeout); timers = [];
+        btnAuto.setAttribute('aria-pressed', 'false');
+        btnAuto.firstChild.nodeValue = 'Auto-scroll';
+      }
+      function startAuto() {
+        stopAuto();
+        btnAuto.setAttribute('aria-pressed', 'true');
+        btnAuto.firstChild.nodeValue = 'Stop';
+        beats.forEach((b, i) => {
+          timers.push(setTimeout(() => { go(i); }, Number(b.dataset.start) * 1000));
+        });
+        var last = beats[beats.length - 1];
+        timers.push(setTimeout(stopAuto, (Number(last.dataset.start) + Number(last.dataset.sec)) * 1000));
+      }
+      function toggleRec() {
+        var on = body.classList.toggle('rec');
+        if (on) window.scrollTo(0, 0);
+      }
+
+      btnScript.addEventListener('click', toggleScript);
+      btnAuto.addEventListener('click', () => { if (timers.length) stopAuto(); else startAuto(); });
+      btnRec.addEventListener('click', toggleRec);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        var k = e.key.toLowerCase();
+        if (k === 's') toggleScript();
+        else if (k === 'a') { if (timers.length) stopAuto(); else startAuto(); }
+        else if (k === 'h') toggleRec();
+        else if (k === 'escape') { body.classList.remove('rec'); stopAuto(); }
+        else if (k === 'arrowdown' || k === 'pagedown' || k === 'j') { e.preventDefault(); go(current() + 1); }
+        else if (k === 'arrowup' || k === 'pageup' || k === 'k') { e.preventDefault(); go(current() - 1); }
+      });
+
+      // Beat 2: step through the three screenshots while the beat is on screen.
+  (function () {
+    var demo = document.getElementById('demo');
+    if (!demo) return;
+    var imgs = Array.prototype.slice.call(demo.querySelectorAll('.stage img'));
+    var btns = Array.prototype.slice.call(demo.querySelectorAll('.dstep'));
+    var gap = Number(demo.dataset.gap) || 2600;
+    var timers3 = [], seen = false;
+    function show(n) {
+      imgs.forEach(function (im, k) { im.classList.toggle('on', k === n); });
+      btns.forEach(function (b, k) { b.classList.toggle('on', k === n); });
+    }
+    function cur() { return imgs.findIndex(function (im) { return im.classList.contains('on'); }); }
+    function stop() { timers3.forEach(clearTimeout); timers3 = []; }
+    function play() {
+      stop(); show(0);
+      for (var k = 1; k < imgs.length; k++) {
+        (function (n) { timers3.push(setTimeout(function () { show(n); }, n * gap)); })(k);
+      }
+    }
+    btns.forEach(function (b) { b.addEventListener('click', function () { stop(); show(Number(b.dataset.i)); }); });
+    demo.querySelector('.stage').addEventListener('click', function () { stop(); show((cur() + 1) % imgs.length); });
+    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting && !seen) { seen = true; play(); }
+          else if (!e.isIntersecting) { seen = false; stop(); show(0); }
+        });
+      }, { threshold: 0.3 }).observe(document.getElementById('b2'));
+    }
+  })();
+
+  // Launch diagrams: reveal the steps one at a time when their beat comes into view.
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        Array.prototype.slice.call(document.querySelectorAll('figure.seq')).forEach((seq) => {
+          var steps = Array.prototype.slice.call(seq.querySelectorAll('.st'));
+          var timers2 = [], seen = false, gap = Number(seq.dataset.gap) || 1050;
+          var play = () => {
+            timers2.forEach(clearTimeout); timers2 = [];
+            seq.classList.add('anim');
+            steps.forEach((st) => { st.classList.remove('on', 'now'); });
+            steps.forEach((st, i) => {
+              timers2.push(setTimeout(() => {
+                steps.forEach((x) => { x.classList.remove('now'); });
+                st.classList.add('on', 'now');
+              }, 500 + i * gap));
+            });
+            timers2.push(setTimeout(() => {
+              steps.forEach((x) => { x.classList.remove('now'); });
+            }, 500 + steps.length * gap));
+          };
+          seq.classList.add('anim');
+          new IntersectionObserver((entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting && !seen) { seen = true; play(); }
+              else if (!e.isIntersecting) { seen = false; }
+            });
+          }, { threshold: 0.3 }).observe(seq.closest('.beat'));
+          seq.addEventListener('click', play);
+        });
+      }
+
+      // Swap a real screenshot into a frame by dropping an image file on it. Nothing is saved.
+      Array.prototype.slice.call(document.querySelectorAll('[data-drop]')).forEach((f) => {
+        f.addEventListener('dragover', (e) => { e.preventDefault(); f.classList.add('over'); });
+        f.addEventListener('dragleave', () => { f.classList.remove('over'); });
+        f.addEventListener('drop', (e) => {
+          e.preventDefault(); f.classList.remove('over');
+          var file = e.dataTransfer && e.dataTransfer.files[0];
+          if (!file || file.type.indexOf('image/') !== 0) return;
+          var r = new FileReader();
+          r.onload = () => {
+            var img = document.createElement('img');
+            img.alt = 'Screenshot of QuickPoll in Canvas';
+            img.src = r.result;
+            f.innerHTML = ''; f.appendChild(img);
+          };
+          r.readAsDataURL(file);
+        });
+      });
+    })();
+  </script>
+</body>
+
+</html>
