@@ -1,3 +1,5 @@
+require "net/http"
+
 module Lti1p3
   class PlatformKeys
     # What to build: app/services/lti1p3/platform_keys.rb
