@@ -112,6 +112,7 @@
   .step .t { font-size: 0.88rem; font-weight: 700; }
   .step .s { font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; }
   .step.done { border-color: #bbf7d0; background: var(--green-tint); }
+  .step.skip { border-style: dashed; background: var(--bg); }
   .step.now { border-color: #fde68a; background: var(--orange-tint); }
 
   details { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; }
@@ -144,7 +145,7 @@
   <div class="chips">
     <span class="chip">LTI 1.1</span>
     <span class="chip">Rails 8 in Docker</span>
-    <span class="chip">Stage 4 of 7</span>
+    <span class="chip">Final: Stages 1 to 4</span>
   </div>
 </header>
 
@@ -182,7 +183,7 @@
           <li>Your app runs the same function on what it received. A match means Canvas sent the form and nobody changed it.</li>
           <li>No match means reject the launch.</li>
         </ul>
-        <div class="callout callout-ok" style="margin-top:14px;"><strong>The app now checks every launch.</strong> It looks up the consumer key, checks the signature, then checks the timestamp and nonce. Any failure gets a 401. A launch that passes saves the person and the course. A verified launch also starts a session, so the next page knows who you are and whether they may create polls. A verified launch then redirects to the poll page. An instructor or a TA creates polls there. Everyone in the course sees them and votes once per poll. A person sees the counts after voting. A poll creator always sees them. The specs pass. Grade passback is next.</div>
+        <div class="callout callout-ok" style="margin-top:14px;"><strong>The app now checks every launch.</strong> It looks up the consumer key, checks the signature, then checks the timestamp and nonce. Any failure gets a 401. A launch that passes saves the person and the course. A verified launch also starts a session, so the next page knows who you are and whether they may create polls. A verified launch then redirects to the poll page. An instructor or a TA creates polls there. Everyone in the course sees them and votes once per poll. A person sees the counts after voting. A poll creator always sees them. The 154 specs pass, and a live launch in the local Canvas works. This app is final. Grade passback and Content-Item were skipped on purpose. Stage 7 became a separate 1.3 app: see <a href="lti-1p1-vs-1p3.html">1.1 versus 1.3 in pictures</a>.</div>
       </div>
     </div>
 
@@ -191,10 +192,10 @@
       <div class="step done"><div class="n">Stage 1</div><div class="t">Capture a launch</div><div class="s">teacher + student</div></div>
       <div class="step done"><div class="n">Stage 2</div><div class="t">Scaffold + config</div><div class="s">launch reaches the stub</div></div>
       <div class="step done"><div class="n">Stage 3</div><div class="t">Verify the launch</div><div class="s">signature + replay guard</div></div>
-      <div class="step now"><div class="n">Stage 4</div><div class="t">Session + polls</div><div class="s">records, session, roles, polls, voting done</div></div>
-      <div class="step"><div class="n">Stage 5</div><div class="t">Grade passback</div></div>
-      <div class="step"><div class="n">Stage 6</div><div class="t">Content-Item</div><div class="s">optional</div></div>
-      <div class="step"><div class="n">Stage 7</div><div class="t">Migrate to 1.3</div></div>
+      <div class="step done"><div class="n">Stage 4</div><div class="t">Session + polls</div><div class="s">records, session, roles, polls, voting</div></div>
+      <div class="step skip"><div class="n">Stage 5</div><div class="t">Grade passback</div><div class="s">skipped</div></div>
+      <div class="step skip"><div class="n">Stage 6</div><div class="t">Content-Item</div><div class="s">skipped</div></div>
+      <div class="step done"><div class="n">Stage 7</div><div class="t">Build a 1.3 copy</div><div class="s">separate app, own database</div></div>
     </div>
   </section>
 
@@ -775,7 +776,7 @@ rspec spec/services</code></pre>
           <tbody>
             <tr><td><code>consumer_key</code></td><td>Two installations sharing a key.</td></tr>
             <tr><td><code>(lti_consumer_id, lti1p1_user_id)</code></td><td>One person getting two rows.</td></tr>
-            <tr><td><code>(lti_consumer_id, lti1p3_sub)</code>, only when set</td><td>Two rows claiming the same 1.3 identity. Used in Stage 7.</td></tr>
+            <tr><td><code>(lti_consumer_id, lti1p3_sub)</code>, only when set</td><td>Two rows claiming the same 1.3 identity. The 1.3 app uses it with the platform in place of the consumer.</td></tr>
             <tr><td><code>(lti_consumer_id, context_id)</code></td><td>One course getting two rows.</td></tr>
             <tr><td><code>(lti_consumer_id, nonce)</code></td><td>A replayed launch. The second insert fails.</td></tr>
             <tr><td><code>(poll_id, lti_user_id)</code></td><td>Voting twice on one poll.</td></tr>
@@ -791,15 +792,15 @@ rspec spec/services</code></pre>
       <div class="edge-card ec-red"><div class="ec-title">used_nonces</div><div class="ec-desc">One row per accepted nonce. A duplicate row means a replay. Written by: <code>ReplayGuard</code>.</div></div>
       <div class="edge-card ec-purple"><div class="ec-title">lti_users</div><div class="ec-desc">One row per Canvas user. Holds the 1.1 <code>user_id</code> and a spare column for the 1.3 <code>sub</code>. Written by: <code>LaunchRecords</code>.</div></div>
       <div class="edge-card ec-teal"><div class="ec-title">lti_contexts</div><div class="ec-desc">One row per course (<code>context_id</code>). Written by: <code>LaunchRecords</code>.</div></div>
-      <div class="edge-card ec-orange"><div class="ec-title">polls</div><div class="ec-desc">A question and its options, owned by a course and a creator. Not written yet.</div></div>
-      <div class="edge-card ec-green"><div class="ec-title">votes</div><div class="ec-desc">One row per user per poll. A unique index enforces it. Not written yet.</div></div>
+      <div class="edge-card ec-orange"><div class="ec-title">polls</div><div class="ec-desc">A question and its options, owned by a course and a creator. Options live in a jsonb array.</div></div>
+      <div class="edge-card ec-green"><div class="ec-title">votes</div><div class="ec-desc">One row per user per poll. A unique index enforces it.</div></div>
     </div>
     <p style="margin-top:12px;">Polls and votes point at <code>lti_users</code> by an internal id, not at the raw LTI id string. In Stage 7 the same person arrives with a different id in 1.3. The internal id keeps their votes attached.</p>
   </section>
 
   <section id="versions">
     <h2>LTI 1.1 versus 1.3</h2>
-    <p>You are building the left column now. Stage 7 turns it into the right column.</p>
+    <p>This app is the left column. The right column is the separate QuickPoll 1.3 app. <a href="lti-1p1-vs-1p3.html">The full comparison, with pictures, is in its own page.</a></p>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Question</th><th>LTI 1.1 (this app)</th><th>LTI 1.3</th></tr></thead>
@@ -848,7 +849,7 @@ rspec spec/services</code></pre>
       <div class="callout callout-warn"><strong><code>to_query</code> encodes a space as <code>+</code>.</strong> OAuth needs <code>%20</code>. Encode each name and value with the same function you use for the URL. This one bug failed every captured launch, because they contain spaces.</div>
       <div class="callout callout-warn"><strong>Use <code>request.request_parameters</code>, not <code>params</code>.</strong> <code>params</code> adds <code>controller</code>, <code>action</code>, and the query keys. Canvas never signed those, so the signature fails.</div>
       <div class="callout callout-warn"><strong>A failed <code>before_action</code> skips every <code>after_action</code>.</strong> The 401 pages kept <code>X-Frame-Options</code>, and Canvas would not show them. Removing the header in a <code>before_action</code> fixes it.</div>
-      <div class="callout callout-warn"><strong>Session cookies in an iframe.</strong> Locally it works, because Canvas and the tool share the <code>inseng.test</code> domain. In production they are different sites, and browsers block third-party cookies. Safari blocks them now. It needs <code>same_site: :none</code> and <code>secure: true</code>, and still may fail. Stage 7 comes back to this.</div>
+      <div class="callout callout-warn"><strong>Session cookies in an iframe.</strong> Locally it works, because Canvas and the tool share the <code>inseng.test</code> domain. In production they are different sites, and browsers block third-party cookies. Safari blocks them now. It needs <code>same_site: :none</code> and <code>secure: true</code>, and still may fail. The 1.3 app has the same problem. It keeps the login state in Postgres, not in a cookie, but it still uses a session cookie after the launch.</div>
       <div class="callout callout-warn"><strong>The <code>json</code> gem.</strong> Version 3.x breaks Rails 8.0.5.2 with <code>unknown keyword: quirks_mode</code>. The <code>Gemfile</code> pins <code>json &lt; 3</code>. Remove the pin after a Rails upgrade that fixes it.</div>
       <div class="callout callout-info"><strong>Iframe header.</strong> Rails sends <code>X-Frame-Options: SAMEORIGIN</code> by default. The browser would refuse to show the page inside Canvas. <code>BaseController</code> removes it.</div>
       <div class="callout callout-info"><strong>Real data.</strong> A launch holds names, emails, and user ids. That is student data under FERPA. Use fake users in a test course, and keep real launches out of shared docs and fixtures.</div>

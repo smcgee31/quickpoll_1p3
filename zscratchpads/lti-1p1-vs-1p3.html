@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LTI 1.1 versus 1.3 in pictures</title>
+<!-- Styled with claude-skills/references/house-style.html (light, card-based). -->
+<style>
+  :root {
+    --bg: #f8fafc; --surface: #ffffff; --ink: #1e293b; --ink-body: #334155; --ink-soft: #64748b; --ink-faint: #94a3b8;
+    --rule: #e2e8f0; --rule-soft: #f1f5f9;
+    --blue: #2563eb; --purple: #7c3aed; --teal: #0d9488; --orange: #d97706; --green: #16a34a; --red: #dc2626;
+    --blue-tint: #eff6ff; --purple-tint: #f5f3ff; --teal-tint: #f0fdfa; --orange-tint: #fffbeb; --green-tint: #f0fdf4; --red-tint: #fef2f2;
+    --hero-from: #1e40af; --hero-to: #7c3aed;
+    --code-bg: #1e1e2e; --code-ink: #cdd6f4; --code-green: #a6e3a1; --code-blue: #89b4fa; --code-orange: #fab387; --code-red: #f38ba8; --code-comment: #6c7086;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --mono: 'SF Mono', 'Fira Code', ui-monospace, Menlo, Consolas, monospace;
+    --radius: 12px; --radius-lg: 16px;
+    --shadow: 0 1px 4px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--ink); line-height: 1.6; }
+
+  .hero { background: linear-gradient(135deg, var(--hero-from) 0%, var(--hero-to) 100%); color: #fff; padding: 56px 24px; text-align: center; }
+  .hero h1 { font-size: 2.6rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; }
+  .hero p { font-size: 1.15rem; color: rgba(255,255,255,0.92); max-width: 640px; margin: 0 auto 20px; }
+  .chips { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .chip { background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+
+  .content { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+  section { margin-bottom: 64px; scroll-margin-top: 16px; }
+  h2 { font-size: 1.5rem; font-weight: 700; color: var(--ink); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
+  h3 { font-size: 1rem; font-weight: 700; color: #334155; margin: 20px 0 8px; }
+  p { color: var(--ink-body); margin-bottom: 12px; max-width: 78ch; }
+  p:last-child { margin-bottom: 0; }
+
+  code { font-family: var(--mono); background: var(--rule-soft); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; color: var(--ink-body); word-break: break-word; }
+  pre { background: var(--code-bg); color: var(--code-ink); padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-family: var(--mono); font-size: 0.85rem; line-height: 1.7; margin: 12px 0; }
+  pre code { background: none; padding: 0; color: inherit; font-size: inherit; word-break: normal; }
+  a { color: var(--blue); }
+  .t-str { color: var(--code-green); } .t-key { color: var(--code-blue); } .t-val { color: var(--code-orange); } .t-del { color: var(--code-red); } .t-com { color: var(--code-comment); }
+
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 760px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } .hero h1 { font-size: 2rem; } }
+
+  .feature-card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 24px; }
+  .feature-head { padding: 24px 28px; border-left: 6px solid; display: flex; align-items: flex-start; gap: 18px; }
+  .fc-blue   { border-color: var(--blue);   background: linear-gradient(135deg, var(--blue-tint),   #fff); }
+  .fc-purple { border-color: var(--purple); background: linear-gradient(135deg, var(--purple-tint), #fff); }
+  .fc-teal   { border-color: var(--teal);   background: linear-gradient(135deg, var(--teal-tint),   #fff); }
+  .fc-orange { border-color: var(--orange); background: linear-gradient(135deg, var(--orange-tint), #fff); }
+  .fc-green  { border-color: var(--green);  background: linear-gradient(135deg, var(--green-tint),  #fff); }
+  .fc-red    { border-color: var(--red);    background: linear-gradient(135deg, var(--red-tint),    #fff); }
+  .fc-icon { font-size: 2.2rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+  .fc-title { font-size: 1.4rem; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+  .fc-desc { font-size: 0.95rem; color: var(--ink-body); }
+  .feature-body { padding: 20px 28px 24px; }
+
+  .edge-card { background: var(--surface); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow-sm); border-top: 4px solid var(--rule); }
+  .ec-blue { border-top-color: var(--blue); } .ec-purple { border-top-color: var(--purple); } .ec-teal { border-top-color: var(--teal); }
+  .ec-orange { border-top-color: var(--orange); } .ec-green { border-top-color: var(--green); } .ec-red { border-top-color: var(--red); }
+  .ec-title { font-size: 0.85rem; font-weight: 700; font-family: var(--mono); color: var(--ink); margin-bottom: 6px; word-break: break-word; }
+  .ec-desc { font-size: 0.85rem; color: var(--ink-soft); line-height: 1.5; }
+
+  .badge { display: inline-block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; padding: 3px 10px; border-radius: 20px; }
+  .b-blue { background: #dbeafe; color: #1d4ed8; } .b-purple { background: #ede9fe; color: #6d28d9; } .b-teal { background: #ccfbf1; color: #0f766e; }
+  .b-orange { background: #ffedd5; color: #c2410c; } .b-green { background: #dcfce7; color: #166534; } .b-red { background: #fee2e2; color: #991b1b; }
+  .b-neutral { background: #f3f4f6; color: #374151; } .b-canvas { background: #fde68a; color: #92400e; }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+
+  .arrow-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .arrow-list li { font-size: 0.9rem; color: var(--ink-body); padding-left: 16px; position: relative; line-height: 1.5; }
+  .arrow-list li::before { content: "\2192"; position: absolute; left: 0; color: var(--ink-faint); }
+
+  .note { background: var(--bg); border: 1px solid var(--rule); border-left: 4px solid var(--ink-faint); border-radius: 8px; padding: 14px 18px; font-size: 0.88rem; color: var(--ink-body); }
+  .note strong { color: #374151; }
+  .callout { border-radius: 10px; padding: 18px 22px; border: 1px solid; border-left-width: 4px; font-size: 0.9rem; }
+  .callout p { font-size: 0.9rem; color: inherit; }
+  .callout-warn { background: var(--orange-tint); border-color: #fed7aa; color: #7c2d12; }
+  .callout-warn strong { color: #9a3412; }
+  .callout-ok { background: var(--green-tint); border-color: #bbf7d0; color: #14532d; }
+  .callout-info { background: var(--blue-tint); border-color: #bfdbfe; color: #1e3a8a; }
+  .callout-bad { background: var(--red-tint); border-color: #fecaca; color: #7f1d1d; }
+
+  .phase-box { border: 1.5px solid var(--rule); border-radius: 10px; padding: 12px 16px; }
+  .pb-blue { border-color: #bfdbfe; background: var(--blue-tint); } .pb-purple { border-color: #ddd6fe; background: var(--purple-tint); }
+  .pb-teal { border-color: #99f6e4; background: var(--teal-tint); } .pb-orange { border-color: #fde68a; background: var(--orange-tint); }
+  .pb-green { border-color: #bbf7d0; background: var(--green-tint); }
+  .phase-num { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); margin-bottom: 2px; }
+  .phase-title { font-size: 0.875rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .phase-desc { font-size: 0.82rem; color: var(--ink-body); line-height: 1.45; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 8px; table-layout: fixed; }
+  th { text-align: left; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); padding: 8px 10px; border-bottom: 1px solid var(--rule); }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--rule-soft); color: var(--ink-body); vertical-align: top; line-height: 1.45; word-break: break-word; }
+  td.path { width: 46%; }
+  tr:last-child td { border-bottom: none; }
+  .table-wrap { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 8px 14px; overflow-x: auto; }
+  .table-wrap table { min-width: 560px; }
+
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
+  nav.toc a { font-size: 0.8rem; font-weight: 600; text-decoration: none; color: var(--blue); background: var(--blue-tint); border: 1px solid #bfdbfe; padding: 4px 12px; border-radius: 20px; }
+  nav.toc a:focus-visible, summary:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+
+  .status { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .step { border: 1.5px solid var(--rule); border-radius: 10px; padding: 10px 14px; background: var(--surface); }
+  .step .n { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); }
+  .step .t { font-size: 0.88rem; font-weight: 700; }
+  .step .s { font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; }
+  .step.done { border-color: #bbf7d0; background: var(--green-tint); }
+  .step.skip { border-style: dashed; background: var(--bg); }
+  .step.now { border-color: #fde68a; background: var(--orange-tint); }
+
+  details { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; }
+  summary { font-weight: 700; cursor: pointer; }
+  details[open] summary { margin-bottom: 8px; }
+  details p { font-size: 0.9rem; }
+
+  figure.diagram { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); margin: 0 0 16px; overflow-x: auto; }
+  figure.diagram svg { width: 100%; min-width: 760px; height: auto; display: block; }
+  figcaption { font-size: 0.82rem; color: var(--ink-soft); margin-top: 8px; }
+  svg .t-h { font-family: var(--sans); font-size: 14px; font-weight: 700; fill: #1e293b; }
+  svg .t-s { font-family: var(--mono); font-size: 11px; fill: #475569; }
+  svg .t-d { font-family: var(--sans); font-size: 12px; fill: #334155; }
+  svg .t-l { font-family: var(--sans); font-size: 12px; font-weight: 700; }
+  svg .bx { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1.5; }
+
+  @media print {
+    body { background: #fff; }
+    .feature-card, .edge-card, .note { box-shadow: none; }
+    pre { background: #f5f8fc; color: #1e293b; border: 1px solid var(--rule); white-space: pre-wrap; }
+    details { break-inside: avoid; }
+  }
+
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .vs { grid-template-columns: 1fr; } }
+  .vs > * { min-width: 0; }
+  .vs pre { font-size: 0.76rem; padding: 14px 16px; }
+  .col-11 { border-top: 5px solid var(--orange); }
+  .col-13 { border-top: 5px solid var(--blue); }
+  .col-11 h3, .col-13 h3 { margin-top: 0; }
+  .panel { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 18px 20px; }
+  .panel p, .panel li { font-size: 0.9rem; }
+  .v11 { background: #ffedd5; color: #c2410c; } .v13 { background: #dbeafe; color: #1d4ed8; }
+  .pill { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 2px 9px; border-radius: 20px; vertical-align: middle; }
+  .big { font-size: 1.05rem; }
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+  .flow .phase-box { flex: 1 1 150px; }
+  .tight td, .tight th { padding: 7px 8px; font-size: 0.84rem; }
+  .keyrow { display: flex; align-items: center; gap: 10px; margin: 6px 0; font-size: 0.9rem; color: var(--ink-body); }
+  .keyrow .ico { font-size: 1.4rem; width: 2rem; text-align: center; }
+  .small { font-size: 0.82rem; color: var(--ink-soft); }
+  svg .t-m { font-family: var(--mono); font-size: 10.5px; fill: #475569; }
+  svg .n-b { font-family: var(--sans); font-size: 12px; font-weight: 800; fill: #fff; text-anchor: middle; }
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>LTI 1.1 versus LTI 1.3</h1>
+  <p>The same poll tool, launched two ways. This page puts the two side by side: the launch, the keys, the message, the checks, the setup, and what each one needs from Canvas.</p>
+  <div class="chips"><span class="chip">Two working apps</span><span class="chip">Checked live in local Canvas</span><span class="chip">Synthetic data only</span></div>
+</header>
+<main class="content">
+<nav class="toc" aria-label="Sections">
+  <a href="#start">Short version</a>
+  <a href="#glance">At a glance</a>
+  <a href="#trips">The launch</a>
+  <a href="#trust">Who holds what</a>
+  <a href="#message">The message</a>
+  <a href="#checks">The checks</a>
+  <a href="#install">Install and setup</a>
+  <a href="#identity">Identity</a>
+  <a href="#roles">Roles</a>
+  <a href="#grades">Grades and services</a>
+  <a href="#browser">Browser limits</a>
+  <a href="#code">In this code</a>
+  <a href="#gotchas">Gotchas</a>
+  <a href="#links">Specs</a>
+</nav>
+
+<section id="start">
+  <h2>The short version</h2>
+  <div class="vs">
+    <div class="feature-card col-11" style="margin-bottom:0">
+      <div class="feature-head fc-orange">
+        <div class="fc-icon">&#x1F4EE;</div>
+        <div><div class="fc-title">LTI 1.1: a signed form</div>
+        <div class="fc-desc">Canvas fills in a web form and signs it with a secret that Canvas and the tool both know. The browser posts the form. The tool signs the same fields again and compares.</div></div>
+      </div>
+    </div>
+    <div class="feature-card col-13" style="margin-bottom:0">
+      <div class="feature-head fc-blue">
+        <div class="fc-icon">&#x1FAAA;</div>
+        <div><div class="fc-title">LTI 1.3: a signed token</div>
+        <div class="fc-desc">The tool starts a login. Canvas then sends a token (a JWT) that Canvas signed with its private key. The tool checks it with Canvas's public keys. Nobody shares a secret.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="callout callout-info" style="margin-top:16px;"><strong>Everything on this page comes from two working apps.</strong> QuickPoll 1.1 and QuickPoll 1.3 run side by side in the same local Canvas. The 1.3 facts (roles, claims, ids) come from real launches, checked on 2026-11-14. All names and ids in the samples below are made up. Real launches hold student and teacher data (FERPA, and GDPR for EU users), so keep them out of docs and chat.</div>
+</section>
+
+<section id="glance">
+  <h2>At a glance</h2>
+  <div class="table-wrap">
+    <table class="tight">
+      <thead><tr><th style="width:20%">Question</th><th style="width:38%"><span class="pill v11">LTI 1.1</span></th><th style="width:42%"><span class="pill v13">LTI 1.3</span></th></tr></thead>
+      <tbody>
+        <tr><td>Browser trips per launch</td><td>One. Canvas to the tool.</td><td>Two. The tool starts a login, then Canvas posts the token.</td></tr>
+        <tr><td>What the tool receives</td><td>Flat form fields.</td><td>One JWT, <code>id_token</code>, with the same facts as claims.</td></tr>
+        <tr><td>Proof that Canvas sent it</td><td>An HMAC-SHA1 signature made with a shared secret.</td><td>An RS256 signature made with the Canvas private key. The tool checks it with the Canvas public keys.</td></tr>
+        <tr><td>Secret the tool must guard</td><td>The shared secret. Canvas holds a copy.</td><td>Only the tool's own private key, and only when the tool calls Canvas services.</td></tr>
+        <tr><td>Stopping a replay</td><td>Timestamp window and a stored nonce.</td><td><code>state</code> saved before the launch and used once, plus <code>nonce</code>, <code>exp</code>, and <code>iat</code>.</td></tr>
+        <tr><td>How Canvas knows the tool</td><td>Pasted XML, a consumer key, a secret.</td><td>A developer key made from JSON. It gives a <code>client_id</code>. Each install adds a <code>deployment_id</code>.</td></tr>
+        <tr><td>How the tool knows Canvas</td><td>The consumer key in the form.</td><td>Three values together: <code>iss</code>, <code>client_id</code>, <code>deployment_id</code>.</td></tr>
+        <tr><td>The person</td><td><code>user_id</code>, 40 hex characters.</td><td><code>sub</code>, a 36-character UUID. A different value. The old one rides in the <code>lti1p1</code> claim.</td></tr>
+        <tr><td>Roles</td><td>Text in <code>roles</code> and <code>ext_roles</code>, like <code>urn:lti:role:ims/lis/Instructor</code>.</td><td>An array of URIs in one claim, like <code>.../membership#Instructor</code>.</td></tr>
+        <tr><td>Grades</td><td>Basic Outcomes: a signed XML POST.</td><td>AGS: REST calls with an OAuth 2.0 access token.</td></tr>
+        <tr><td>Roster and content picker</td><td>No standard roster. Content-Item for picking content.</td><td>NRPS for the roster. Deep Linking for picking content.</td></tr>
+        <tr><td>Cookies in the iframe</td><td>The launch needs none.</td><td>The login needs state that survives a redirect. A cookie may not.</td></tr>
+        <tr><td>Standards underneath</td><td>OAuth 1.0a (RFC 5849).</td><td>OpenID Connect, JWT and JWS, OAuth 2.0.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="trips">
+  <h2>The launch, step by step</h2>
+  <p>Both diagrams show a click on the course menu link. Time runs top to bottom. A solid arrow is a request. A dashed arrow is the answer.</p>
+
+  <h3><span class="pill v11">LTI 1.1</span> One trip</h3>
+  <figure class="diagram">
+    <svg viewBox="0 0 1060 400" role="img" aria-label="LTI 1.1 launch: one trip. Canvas gives the browser a signed form, the browser posts it to the tool, the tool checks it and redirects.">
+<defs><marker id="a11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#475569"/></marker></defs>
+<line x1="150" y1="54" x2="150" y2="390" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5 5"/>
+<rect x="65" y="6" width="170" height="48" rx="10" fill="#f0fdfa" stroke="#0d9488" stroke-width="2"/>
+<text class="t-h" x="150" y="26" text-anchor="middle">Browser</text>
+<text class="t-s" x="150" y="43" text-anchor="middle">inside the Canvas iframe</text>
+<line x1="500" y1="54" x2="500" y2="390" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5 5"/>
+<rect x="415" y="6" width="170" height="48" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+<text class="t-h" x="500" y="26" text-anchor="middle">Canvas</text>
+<text class="t-s" x="500" y="43" text-anchor="middle">the platform</text>
+<line x1="850" y1="54" x2="850" y2="390" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5 5"/>
+<rect x="765" y="6" width="170" height="48" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text class="t-h" x="850" y="26" text-anchor="middle">QuickPoll</text>
+<text class="t-s" x="850" y="43" text-anchor="middle">the tool</text>
+<line x1="156" y1="110" x2="494" y2="110" stroke="#475569" stroke-width="2" marker-end="url(#a11)"/>
+<text class="t-d" x="325.0" y="92" text-anchor="middle" style="font-weight:700">1  Click QuickPoll 1.1 in the course menu</text>
+<line x1="494" y1="175" x2="156" y2="175" stroke="#475569" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a11)"/>
+<text class="t-d" x="325.0" y="157" text-anchor="middle" style="font-weight:700">2  Canvas answers with a page that holds a form</text>
+<text class="t-m" x="325.0" y="170" text-anchor="middle">about 30 fields, plus oauth_signature</text>
+<line x1="156" y1="245" x2="844" y2="245" stroke="#475569" stroke-width="2" marker-end="url(#a11)"/>
+<text class="t-d" x="500.0" y="227" text-anchor="middle" style="font-weight:700">3  The browser posts the whole form</text>
+<text class="t-m" x="500.0" y="240" text-anchor="middle">POST /lti/launch</text>
+<rect x="685.0" y="262" width="330" height="66" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+<text class="t-l" x="850" y="279" text-anchor="middle" fill="#2563eb">The tool checks the launch</text>
+<text class="t-d" x="850" y="295" text-anchor="middle">rebuilds the signature from the shared secret</text>
+<text class="t-d" x="850" y="311" text-anchor="middle">checks the timestamp and the nonce</text>
+<line x1="844" y1="365" x2="156" y2="365" stroke="#475569" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a11)"/>
+<text class="t-d" x="500.0" y="347" text-anchor="middle" style="font-weight:700">4  303 redirect to the poll page</text>
+<text class="t-m" x="500.0" y="360" text-anchor="middle">GET /lti/polls</text>
+</svg>
+    <figcaption>Canvas does all the work before the browser moves. The browser only carries the form. The tool needs one request and no database lookup other than its own tables.</figcaption>
+  </figure>
+
+  <h3><span class="pill v13">LTI 1.3</span> Two trips and a key download</h3>
+  <figure class="diagram">
+    <svg viewBox="0 0 1060 830" role="img" aria-label="LTI 1.3 launch: two browser trips. Login first, then Canvas posts a signed id_token that the tool checks with the Canvas public keys.">
+<defs><marker id="a13" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#475569"/></marker></defs>
+<line x1="150" y1="54" x2="150" y2="820" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5 5"/>
+<rect x="65" y="6" width="170" height="48" rx="10" fill="#f0fdfa" stroke="#0d9488" stroke-width="2"/>
+<text class="t-h" x="150" y="26" text-anchor="middle">Browser</text>
+<text class="t-s" x="150" y="43" text-anchor="middle">inside the Canvas iframe</text>
+<line x1="500" y1="54" x2="500" y2="820" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5 5"/>
+<rect x="415" y="6" width="170" height="48" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+<text class="t-h" x="500" y="26" text-anchor="middle">Canvas</text>
+<text class="t-s" x="500" y="43" text-anchor="middle">the platform</text>
+<line x1="850" y1="54" x2="850" y2="820" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5 5"/>
+<rect x="765" y="6" width="170" height="48" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text class="t-h" x="850" y="26" text-anchor="middle">QuickPoll</text>
+<text class="t-s" x="850" y="43" text-anchor="middle">the tool</text>
+<line x1="156" y1="108" x2="494" y2="108" stroke="#475569" stroke-width="2" marker-end="url(#a13)"/>
+<text class="t-d" x="325.0" y="90" text-anchor="middle" style="font-weight:700">1  Click QuickPoll 1.3 in the course menu</text>
+<text class="t-m" x="325.0" y="103" text-anchor="middle">GET /courses/1/external_tools/21</text>
+<line x1="494" y1="168" x2="156" y2="168" stroke="#475569" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a13)"/>
+<text class="t-d" x="325.0" y="150" text-anchor="middle" style="font-weight:700">2  Canvas sends the browser to the tool&#x27;s login URL</text>
+<text class="t-m" x="325.0" y="163" text-anchor="middle">iss, client_id, login_hint, lti_message_hint</text>
+<line x1="156" y1="228" x2="844" y2="228" stroke="#475569" stroke-width="2" marker-end="url(#a13)"/>
+<text class="t-d" x="500.0" y="210" text-anchor="middle" style="font-weight:700">3  The browser calls the tool to start the login</text>
+<text class="t-m" x="500.0" y="223" text-anchor="middle">GET or POST /lti/login</text>
+<rect x="685.0" y="244" width="330" height="52" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+<text class="t-l" x="850" y="261" text-anchor="middle" fill="#7c3aed">Save state and nonce</text>
+<text class="t-d" x="850" y="277" text-anchor="middle">new row in lti_launch_states (Postgres)</text>
+<line x1="844" y1="336" x2="156" y2="336" stroke="#475569" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a13)"/>
+<text class="t-d" x="500.0" y="318" text-anchor="middle" style="font-weight:700">4  302 redirect back to Canvas</text>
+<text class="t-m" x="500.0" y="331" text-anchor="middle">Canvas auth URL + state, nonce, redirect_uri, client_id</text>
+<line x1="156" y1="396" x2="494" y2="396" stroke="#475569" stroke-width="2" marker-end="url(#a13)"/>
+<text class="t-d" x="325.0" y="378" text-anchor="middle" style="font-weight:700">5  The browser asks Canvas to authorize</text>
+<text class="t-m" x="325.0" y="391" text-anchor="middle">authorize_redirect, then authorize</text>
+<rect x="335.0" y="412" width="330" height="66" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+<text class="t-l" x="500" y="429" text-anchor="middle" fill="#d97706">Canvas builds the id_token</text>
+<text class="t-d" x="500" y="445" text-anchor="middle">checks client_id and redirect_uri</text>
+<text class="t-d" x="500" y="461" text-anchor="middle">signs a JWT with the Canvas private key</text>
+<line x1="494" y1="520" x2="156" y2="520" stroke="#475569" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a13)"/>
+<text class="t-d" x="325.0" y="502" text-anchor="middle" style="font-weight:700">6  Canvas answers with an auto-submitting form</text>
+<text class="t-m" x="325.0" y="515" text-anchor="middle">id_token + state</text>
+<line x1="156" y1="580" x2="844" y2="580" stroke="#475569" stroke-width="2" marker-end="url(#a13)"/>
+<text class="t-d" x="500.0" y="562" text-anchor="middle" style="font-weight:700">7  The browser posts the token</text>
+<text class="t-m" x="500.0" y="575" text-anchor="middle">POST /lti/launch</text>
+<line x1="844" y1="650" x2="506" y2="650" stroke="#475569" stroke-width="2" marker-end="url(#a13)"/>
+<text class="t-d" x="675.0" y="632" text-anchor="middle" style="font-weight:700">8  The tool downloads the Canvas public keys</text>
+<text class="t-m" x="675.0" y="645" text-anchor="middle">GET /api/lti/security/jwks (server to server)</text>
+<rect x="685.0" y="668" width="330" height="82" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+<text class="t-l" x="850" y="685" text-anchor="middle" fill="#2563eb">The tool checks the token</text>
+<text class="t-d" x="850" y="701" text-anchor="middle">state, signature, iss, aud, exp, iat, nonce,</text>
+<text class="t-d" x="850" y="717" text-anchor="middle">message type, version, deployment id;</text>
+<text class="t-d" x="850" y="733" text-anchor="middle">then saves the person and the course</text>
+<line x1="844" y1="795" x2="156" y2="795" stroke="#475569" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a13)"/>
+<text class="t-d" x="500.0" y="777" text-anchor="middle" style="font-weight:700">9  303 redirect to the poll page</text>
+<text class="t-m" x="500.0" y="790" text-anchor="middle">GET /lti/polls</text>
+</svg>
+    <figcaption>Steps 3 and 4 are the new first trip: the tool starts the login and parks a <code>state</code> and a <code>nonce</code>. Steps 5 to 7 are the second trip: Canvas answers with the signed token. Step 8 happens on the server, with no browser.</figcaption>
+  </figure>
+  <div class="callout callout-ok"><strong>Why 1.3 adds a login trip.</strong> The tool picks the <code>nonce</code> and Canvas puts it inside the signed token. When the token comes back, the tool knows it answers a login it started. In 1.1 Canvas picks everything, so the tool can only check that the form is fresh and new.</div>
+</section>
+
+<section id="trust">
+  <h2>Who holds which key</h2>
+  <div class="vs">
+    <div class="panel col-11">
+      <h3><span class="pill v11">LTI 1.1</span> One shared secret</h3>
+      <div class="keyrow"><span class="ico">&#x1F3E2;</span><span><strong>Canvas</strong> holds the secret. It signs the form.</span></div>
+      <div class="keyrow"><span class="ico">&#x1F6E0;</span><span><strong>The tool</strong> holds the same secret. It signs the fields again and compares.</span></div>
+      <div class="keyrow"><span class="ico">&#x26A0;</span><span>If either copy leaks, anyone can forge a launch. A copy sits in two databases.</span></div>
+      <p class="small" style="margin-top:10px;">QuickPoll 1.1 stores it in <code>lti_consumers.shared_secret</code>. A launch names its consumer with <code>oauth_consumer_key</code>.</p>
+    </div>
+    <div class="panel col-13">
+      <h3><span class="pill v13">LTI 1.3</span> Two key pairs</h3>
+      <div class="keyrow"><span class="ico">&#x1F3E2;</span><span><strong>Canvas</strong> signs the launch token with its private key. It publishes the public key at a JWKS URL.</span></div>
+      <div class="keyrow"><span class="ico">&#x1F6E0;</span><span><strong>The tool</strong> downloads that public key and checks the token. It keeps no Canvas secret.</span></div>
+      <div class="keyrow"><span class="ico">&#x1F511;</span><span>The tool has its own pair too. It signs with the private half when it calls Canvas services like AGS. Canvas reads the public half from <code>/lti/jwks</code>.</span></div>
+      <p class="small" style="margin-top:10px;">QuickPoll 1.3 makes the pair for each registration and stores both halves in <code>lti_registrations</code>. The private half sits unencrypted for now: that is a known gap.</p>
+    </div>
+  </div>
+</section>
+
+<section id="message">
+  <h2>What the message looks like</h2>
+  <div class="vs">
+    <div class="col-11 panel">
+      <h3><span class="pill v11">LTI 1.1</span> Form fields</h3>
+<pre><code><span class="t-com"># POST /lti/launch (sample, shortened)</span>
+<span class="t-key">oauth_consumer_key</span>=<span class="t-str">key</span>
+<span class="t-key">oauth_signature_method</span>=<span class="t-str">HMAC-SHA1</span>
+<span class="t-key">oauth_timestamp</span>=<span class="t-val">1700000000</span>
+<span class="t-key">oauth_nonce</span>=<span class="t-str">a1b2c3...</span>
+<span class="t-key">oauth_signature</span>=<span class="t-str">Zm9v...</span>
+<span class="t-key">lti_message_type</span>=<span class="t-str">basic-lti-launch-request</span>
+<span class="t-key">lti_version</span>=<span class="t-str">LTI-1p0</span>
+<span class="t-key">user_id</span>=<span class="t-str">&lt;40 hex characters&gt;</span>
+<span class="t-key">roles</span>=<span class="t-str">Instructor</span>
+<span class="t-key">context_id</span>=<span class="t-str">&lt;opaque id&gt;</span>
+<span class="t-key">context_title</span>=<span class="t-str">Test Course 1</span>
+<span class="t-key">lis_person_name_full</span>=<span class="t-str">Test Teacher 1</span>
+<span class="t-key">resource_link_id</span>=<span class="t-str">&lt;opaque id&gt;</span></code></pre>
+    </div>
+    <div class="col-13 panel">
+      <h3><span class="pill v13">LTI 1.3</span> Claims in a JWT</h3>
+<pre><code><span class="t-com"># id_token payload (sample, shortened)</span>
+{
+  <span class="t-key">"iss"</span>: <span class="t-str">"https://canvas.instructure.com"</span>,
+  <span class="t-key">"aud"</span>: <span class="t-str">"10000000000011"</span>,        <span class="t-com"># the client_id</span>
+  <span class="t-key">"sub"</span>: <span class="t-str">"&lt;uuid&gt;"</span>,
+  <span class="t-key">"exp"</span>: <span class="t-val">1700000300</span>, <span class="t-key">"iat"</span>: <span class="t-val">1700000000</span>,
+  <span class="t-key">"nonce"</span>: <span class="t-str">"&lt;the tool's nonce&gt;"</span>,
+  <span class="t-key">"name"</span>: <span class="t-str">"Test Teacher 1"</span>,
+  <span class="t-key">".../claim/message_type"</span>: <span class="t-str">"LtiResourceLinkRequest"</span>,
+  <span class="t-key">".../claim/version"</span>: <span class="t-str">"1.3.0"</span>,
+  <span class="t-key">".../claim/deployment_id"</span>: <span class="t-str">"21:&lt;hash&gt;"</span>,
+  <span class="t-key">".../claim/roles"</span>: [<span class="t-str">".../membership#Instructor"</span>, ...],
+  <span class="t-key">".../claim/context"</span>: { <span class="t-key">"id"</span>: <span class="t-str">"&lt;opaque id&gt;"</span>, ... },
+  <span class="t-key">".../claim/resource_link"</span>: { <span class="t-key">"id"</span>: <span class="t-str">"&lt;opaque id&gt;"</span> },
+  <span class="t-key">".../claim/lti1p1"</span>: { <span class="t-key">"user_id"</span>: <span class="t-str">"&lt;the 1.1 user_id&gt;"</span> }
+}</code></pre>
+    </div>
+  </div>
+  <p class="small">In the real token each <code>...</code> stands for <code>https://purl.imsglobal.org/spec/lti/</code>. Claim names are full URLs.</p>
+
+  <h3>Where each 1.1 field went</h3>
+  <div class="table-wrap">
+    <table class="tight">
+      <thead><tr><th style="width:34%">1.1 form field</th><th style="width:36%">1.3 claim</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><code>oauth_consumer_key</code></td><td><code>aud</code> and <code>deployment_id</code></td><td>The tool now needs both to know the sender.</td></tr>
+        <tr><td><code>lti_message_type</code>, <code>lti_version</code></td><td><code>.../claim/message_type</code>, <code>.../claim/version</code></td><td>Values change: <code>LtiResourceLinkRequest</code> and <code>1.3.0</code>.</td></tr>
+        <tr><td><code>user_id</code></td><td><code>sub</code></td><td>Different value. The 1.1 value arrives in <code>.../claim/lti1p1</code>.</td></tr>
+        <tr><td><code>roles</code>, <code>ext_roles</code></td><td><code>.../claim/roles</code></td><td>One array of URIs.</td></tr>
+        <tr><td><code>context_id</code>, <code>context_title</code>, <code>context_label</code></td><td><code>.../claim/context</code></td><td>An object with <code>id</code>, <code>title</code>, <code>label</code>.</td></tr>
+        <tr><td><code>resource_link_id</code></td><td><code>.../claim/resource_link</code></td><td>An object with <code>id</code>.</td></tr>
+        <tr><td><code>lis_person_name_full</code></td><td><code>name</code></td><td>Also <code>given_name</code>, <code>family_name</code>. <code>email</code> only when Canvas sends it.</td></tr>
+        <tr><td><code>launch_presentation_return_url</code></td><td><code>.../claim/launch_presentation</code></td><td>An object.</td></tr>
+        <tr><td><code>tool_consumer_instance_guid</code></td><td><code>iss</code> and <code>.../claim/tool_platform</code></td><td>The issuer names the platform.</td></tr>
+        <tr><td><code>custom_*</code></td><td><code>.../claim/custom</code></td><td>An object.</td></tr>
+        <tr><td><code>oauth_timestamp</code>, <code>oauth_nonce</code></td><td><code>iat</code>, <code>exp</code>, <code>nonce</code></td><td>The tool picks the nonce now.</td></tr>
+        <tr><td><code>lis_outcome_service_url</code>, <code>lis_result_sourcedid</code></td><td>The AGS endpoint claim</td><td>Only when the tool asks for AGS scopes. QuickPoll asks for none, so the claim is absent.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="checks">
+  <h2>What the tool checks</h2>
+  <div class="vs">
+    <div class="panel col-11">
+      <h3><span class="pill v11">LTI 1.1</span> Four checks</h3>
+      <div class="phase-box pb-orange"><div class="phase-num">Check 1</div><div class="phase-title">Known consumer</div><div class="phase-desc">Find <code>oauth_consumer_key</code> in <code>lti_consumers</code>.</div></div>
+      <div class="phase-box pb-orange" style="margin-top:8px"><div class="phase-num">Check 2</div><div class="phase-title">Signature</div><div class="phase-desc">Rebuild the base string, sign it with the secret, compare in constant time.</div></div>
+      <div class="phase-box pb-orange" style="margin-top:8px"><div class="phase-num">Check 3</div><div class="phase-title">Timestamp</div><div class="phase-desc">Inside the allowed window.</div></div>
+      <div class="phase-box pb-orange" style="margin-top:8px"><div class="phase-num">Check 4</div><div class="phase-title">Nonce</div><div class="phase-desc">Not seen before. Store it in <code>used_nonces</code> (unique index).</div></div>
+    </div>
+    <div class="panel col-13">
+      <h3><span class="pill v13">LTI 1.3</span> Checks, in this order</h3>
+      <div class="phase-box pb-purple"><div class="phase-num">First: the login</div><div class="phase-title">State</div><div class="phase-desc">Present, known, unused, under 10 minutes old.</div></div>
+      <div class="phase-box pb-blue" style="margin-top:8px"><div class="phase-num">Then: the token</div><div class="phase-title">Signature</div><div class="phase-desc">Canvas public keys, RS256 only. A bad or odd token is refused before any claim is read.</div></div>
+      <div class="phase-box pb-blue" style="margin-top:8px"><div class="phase-num">Then: the claims</div><div class="phase-title">Who, for whom, when</div><div class="phase-desc"><code>iss</code> is the platform. <code>aud</code> is our client id. <code>exp</code> is in the future. <code>iat</code> is not far ahead (60 seconds of slack).</div></div>
+      <div class="phase-box pb-blue" style="margin-top:8px"><div class="phase-num">Then: the meaning</div><div class="phase-title">Nonce, type, version, deployment</div><div class="phase-desc">The nonce is the one we saved. The message is a resource link launch. The version is 1.3.0. The deployment belongs to this registration.</div></div>
+      <div class="phase-box pb-green" style="margin-top:8px"><div class="phase-num">Last</div><div class="phase-title">Use up the state</div><div class="phase-desc">One conditional update. A second launch with the same state fails.</div></div>
+    </div>
+  </div>
+  <div class="callout callout-warn" style="margin-top:14px;"><strong>The order matters.</strong> A failed check leaves the state unused, so a refused forgery cannot burn a real login. The state is marked used last, after every other check passes.</div>
+</section>
+
+<section id="install">
+  <h2>Install and setup</h2>
+  <div class="vs">
+    <div class="panel col-11">
+      <h3><span class="pill v11">LTI 1.1</span> Paste XML, pick a secret</h3>
+      <ol class="arrow-list">
+        <li>The tool serves an XML cartridge at <code>/lti/config</code>.</li>
+        <li>In Canvas: Settings, Apps, + App, Paste XML.</li>
+        <li>You choose the consumer key and the shared secret. Type the same pair into the tool's database.</li>
+      </ol>
+      <p class="small" style="margin-top:10px;">Canvas gives you nothing back. The tool needs no Canvas addresses, because Canvas contacts the tool and never the reverse.</p>
+    </div>
+    <div class="panel col-13">
+      <h3><span class="pill v13">LTI 1.3</span> Developer key, then a deployment</h3>
+      <ol class="arrow-list">
+        <li>The tool serves JSON at <code>/lti/tool_config</code>.</li>
+        <li>In Canvas: Developer Keys, + Developer Key, LTI Key. Paste the JSON. Add the redirect URI. Turn the key on.</li>
+        <li>Canvas gives you a <strong>client id</strong>, a long number like <code>10000000000011</code>.</li>
+        <li>Installing the key makes a <strong>deployment</strong> with its own id, like <code>21:&lt;hash&gt;</code>. Set its availability to Available.</li>
+        <li>Give the tool the Canvas addresses and both ids (<code>rake lti:platform</code>, <code>rake lti:register</code>).</li>
+      </ol>
+      <p class="small" style="margin-top:10px;">The tool now calls Canvas too. It reads the Canvas keys, so it must know the Canvas JWKS address.</p>
+    </div>
+  </div>
+
+  <h3>What each app stores about the other side</h3>
+  <div class="vs">
+    <div class="panel col-11">
+      <p><strong>QuickPoll 1.1</strong></p>
+      <ul class="arrow-list">
+        <li><code>lti_consumers</code>: <code>consumer_key</code>, <code>shared_secret</code>, <code>instance_guid</code></li>
+        <li><code>used_nonces</code>: <code>nonce</code>, <code>oauth_timestamp</code></li>
+      </ul>
+    </div>
+    <div class="panel col-13">
+      <p><strong>QuickPoll 1.3</strong></p>
+      <ul class="arrow-list">
+        <li><code>lti_platforms</code>: <code>issuer</code>, <code>auth_endpoint</code>, <code>token_endpoint</code>, <code>jwks_uri</code></li>
+        <li><code>lti_registrations</code>: <code>client_id</code>, <code>public_key</code>, <code>private_key</code>, <code>kid</code></li>
+        <li><code>lti_deployments</code>: <code>deployment_id</code></li>
+        <li><code>lti_launch_states</code>: <code>state</code>, <code>nonce</code>, <code>used_at</code></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="identity">
+  <h2>Identity: one person, two ids</h2>
+  <p>Canvas gives the same person a different id in each version. The 1.3 launch carries both, so a tool can connect them.</p>
+  <div class="flow">
+    <div class="phase-box pb-orange"><div class="phase-num">LTI 1.1</div><div class="phase-title"><code>user_id</code></div><div class="phase-desc">40 hex characters. Stored in <code>lti_users.lti1p1_user_id</code>.</div></div>
+    <div class="phase-box pb-blue"><div class="phase-num">LTI 1.3</div><div class="phase-title"><code>sub</code></div><div class="phase-desc">A 36-character UUID. Stored in <code>lti_users.lti1p3_sub</code>.</div></div>
+    <div class="phase-box pb-green"><div class="phase-num">The bridge</div><div class="phase-title"><code>.../claim/lti1p1</code></div><div class="phase-desc">Holds <code>user_id</code>, the old 1.1 value. Present in every live launch.</div></div>
+  </div>
+  <div class="callout callout-ok" style="margin-top:14px;"><strong>Checked live.</strong> The <code>user_id</code> inside the 1.3 claim matched <code>lti1p1_user_id</code> in the 1.1 database for the teacher, the TA, and the student. The claim held only <code>user_id</code>. It had no consumer key and no signature, because Canvas finds the old 1.1 tool by matching URLs, and the two apps use different hostnames. A cutover test would run the 1.3 app on the 1.1 address.</div>
+  <p style="margin-top:12px;">QuickPoll stores polls and votes against its own internal id (<code>lti_users.id</code>), not against either LTI id. That keeps votes attached to the person if the LTI id changes.</p>
+</section>
+
+<section id="roles">
+  <h2>Roles</h2>
+  <div class="table-wrap">
+    <table class="tight">
+      <thead><tr><th style="width:16%">Person</th><th style="width:42%"><span class="pill v11">LTI 1.1</span> <code>roles</code> and <code>ext_roles</code></th><th style="width:42%"><span class="pill v13">LTI 1.3</span> roles claim (real, from Canvas)</th></tr></thead>
+      <tbody>
+        <tr><td>Teacher</td><td><code>Instructor</code></td><td><code>institution/person#Instructor</code>, <code>membership#Instructor</code>, <code>system/person#User</code></td></tr>
+        <tr><td>Student</td><td><code>Learner</code></td><td><code>institution/person#Student</code>, <code>membership#Learner</code>, <code>system/person#User</code></td></tr>
+        <tr><td>TA</td><td><code>urn:lti:role:ims/lis/TeachingAssistant</code>, and <code>ext_roles</code> also lists <code>Instructor</code></td><td><code>institution/person#Instructor</code>, <code>membership#Instructor</code>, <code>membership/Instructor#TeachingAssistant</code>, <code>system/person#User</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid grid-2" style="margin-top:14px;">
+    <div class="callout callout-warn"><strong>The name moved.</strong> In 1.1 the role name is the text after the last <code>/</code>. In 1.3 it is the text after the last <code>#</code>. Apply the 1.1 rule to a 1.3 URI and <code>membership#Instructor</code> comes out whole, so no role matches.</div>
+    <div class="callout callout-ok"><strong>Same result.</strong> A TA counts as an instructor in both versions. QuickPoll lets an instructor or a TA create polls (<code>can_create_polls?</code>) and everyone else only votes.</div>
+  </div>
+</section>
+
+<section id="grades">
+  <h2>Grades and other services</h2>
+  <p>Neither QuickPoll builds grade passback. The two methods differ a lot, and the 1.3 one explains why the tool publishes its own key.</p>
+  <div class="vs">
+    <div class="panel col-11">
+      <h3><span class="pill v11">LTI 1.1</span> Basic Outcomes</h3>
+      <div class="flow">
+        <div class="phase-box pb-orange"><div class="phase-num">Launch</div><div class="phase-desc">The form carries <code>lis_outcome_service_url</code> and <code>lis_result_sourcedid</code>.</div></div>
+        <div class="phase-box pb-orange"><div class="phase-num">Later</div><div class="phase-desc">The tool posts a signed XML <code>replaceResult</code> with a body hash, using the shared secret.</div></div>
+      </div>
+    </div>
+    <div class="panel col-13">
+      <h3><span class="pill v13">LTI 1.3</span> Assignment and Grade Services</h3>
+      <div class="flow">
+        <div class="phase-box pb-blue"><div class="phase-num">Setup</div><div class="phase-desc">The config lists scopes. The launch carries a line item address.</div></div>
+        <div class="phase-box pb-blue"><div class="phase-num">Token</div><div class="phase-desc">The tool signs a JWT with its private key and posts it to the Canvas token endpoint. Canvas returns an access token.</div></div>
+        <div class="phase-box pb-blue"><div class="phase-num">Score</div><div class="phase-desc">The tool posts a score as JSON with that token.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="table-wrap" style="margin-top:14px;">
+    <table class="tight">
+      <thead><tr><th>You want to</th><th><span class="pill v11">LTI 1.1</span></th><th><span class="pill v13">LTI 1.3</span></th></tr></thead>
+      <tbody>
+        <tr><td>Send a grade</td><td>Basic Outcomes</td><td>AGS</td></tr>
+        <tr><td>Read who is in the course</td><td>No standard way</td><td>NRPS</td></tr>
+        <tr><td>Let a teacher pick content for a link</td><td>Content-Item</td><td>Deep Linking</td></tr>
+        <tr><td>Register without pasting values</td><td>Not available</td><td>Dynamic Registration</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="browser">
+  <h2>Browsers, iframes, and cookies</h2>
+  <div class="vs">
+    <div class="panel col-11">
+      <h3><span class="pill v11">LTI 1.1</span></h3>
+      <p>The launch is one POST that proves itself, so it needs no cookie. The tool starts a session after the check. That session cookie sits in an iframe, so it has the third-party cookie problem in production.</p>
+    </div>
+    <div class="panel col-13">
+      <h3><span class="pill v13">LTI 1.3</span></h3>
+      <p>The login trip leaves the tool and comes back. The tool needs to remember <code>state</code> across that trip. A cookie would be the usual place, and an iframe may block it. QuickPoll 1.3 keeps the state in Postgres instead. That works anywhere, but nothing ties the state to this browser. After the launch it still uses a session cookie, with the same limit as 1.1.</p>
+    </div>
+  </div>
+  <div class="callout callout-info" style="margin-top:14px;"><strong>The real fix is a platform storage handshake.</strong> The live 1.3 launch URL carried <code>lti_storage_target=post_message_forwarding</code>. That is Canvas offering a way to store state through browser messages. QuickPoll ignores it today.</div>
+</section>
+
+<section id="code">
+  <h2>What changed in this code</h2>
+  <div class="table-wrap">
+    <table class="tight">
+      <thead><tr><th style="width:36%">1.1 piece</th><th style="width:36%">1.3 piece</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><code>Lti1p1::SignatureVerifier</code></td><td><code>Lti1p3::LaunchVerifier</code></td><td>Both return true or false and an error symbol.</td></tr>
+        <tr><td><code>Lti1p1::ReplayGuard</code> and <code>used_nonces</code></td><td><code>lti_launch_states</code></td><td>The check moves from after the launch to before it.</td></tr>
+        <tr><td>none</td><td><code>Lti::LoginController</code></td><td>The new first trip.</td></tr>
+        <tr><td>none</td><td><code>Lti1p3::PlatformKeys</code></td><td>Downloads the Canvas keys.</td></tr>
+        <tr><td><code>LtiConsumer</code></td><td><code>LtiPlatform</code>, <code>LtiRegistration</code>, <code>LtiDeployment</code></td><td>One row becomes three.</td></tr>
+        <tr><td><code>Lti::ConfigurationController</code> (XML)</td><td><code>Lti::ToolConfigController</code> (JSON) and <code>Lti::JwksController</code></td><td></td></tr>
+        <tr><td><code>Lti1p1::LaunchRecords</code></td><td><code>Lti1p3::LaunchRecords</code></td><td>Looks rows up through the platform.</td></tr>
+        <tr><td><code>Lti1p1::Roles</code></td><td><code>Lti1p3::Roles</code></td><td>The <code>#</code> rule.</td></tr>
+        <tr><td><code>Lti::LaunchController</code></td><td>the same file</td><td>Branches on <code>id_token</code> until step F removes the 1.1 side.</td></tr>
+        <tr><td>polls, votes, views, session</td><td>unchanged</td><td>The code that does the work does not care which version launched it.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small" style="margin-top:10px;">Specs: the 1.1 repo has 154. The 1.3 repo has 326 examples, and that count still includes the 1.1 specs until step F.</p>
+</section>
+
+<section id="gotchas">
+  <h2>Gotchas we hit going live</h2>
+  <div class="grid grid-2">
+    <div class="callout callout-warn"><strong>The client id is the long number.</strong> The short key id in the Canvas URL (11) is not the client id. The launch sends <code>10000000000011</code> as <code>aud</code>. A registration with the short value never matches.</div>
+    <div class="callout callout-warn"><strong>A new install is unavailable.</strong> Canvas sets the deployment to unavailable. The link stays out of course navigation until you set Availability to Available.</div>
+    <div class="callout callout-warn"><strong>Specs stub the network.</strong> The key download passed every spec and crashed in the first real launch, because <code>net/http</code> was not loaded. A live launch tests what a stub cannot.</div>
+    <div class="callout callout-warn"><strong>A running server loads gems once.</strong> After a Gemfile change the running Puma lacked <code>json-jwt</code>. A restart fixed it.</div>
+  </div>
+</section>
+
+<section id="links">
+  <h2>The specs behind this</h2>
+  <ul class="arrow-list">
+    <li><a href="https://www.imsglobal.org/spec/lti/v1p3">LTI 1.3 core</a></li>
+    <li><a href="https://www.imsglobal.org/spec/security/v1p0">1EdTech security framework</a> (the login, the token, the service tokens)</li>
+    <li><a href="https://www.imsglobal.org/spec/lti/v1p3/migr">LTI 1.3 migration guide</a> (the <code>lti1p1</code> claim)</li>
+    <li><a href="https://www.imsglobal.org/spec/lti-ags/v2p0">Assignment and Grade Services</a></li>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc5849">RFC 5849</a>: OAuth 1.0a, the base of the 1.1 signature</li>
+    <li><a href="https://openid.net/specs/openid-connect-core-1_0.html">OpenID Connect Core</a>: the login in 1.3</li>
+  </ul>
+  <p class="small" style="margin-top:10px;">Next: <a href="quickpoll-1p3-walkthrough.html">how QuickPoll 1.3 works, file by file</a> and <a href="quickpoll-1p1-walkthrough.html">how QuickPoll 1.1 works</a>.</p>
+</section>
+
+</main>
+</body>
+</html>
