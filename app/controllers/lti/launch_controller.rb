@@ -22,6 +22,7 @@ module Lti
       records.call
 
       reset_session
+      session[:can_create_polls] = Lti1p3::Roles.new(verifier.claims).can_create_polls?
       session[:lti_user_id] = records.user.id
       session[:lti_context_id] = records.context.id
 
