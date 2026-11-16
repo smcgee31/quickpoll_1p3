@@ -1,330 +1,1137 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QuickPoll 1.1 Walkthrough</title>
-<!-- Styled with claude-skills/references/house-style.html (light, card-based). -->
-<style>
-  :root {
-    --bg: #f8fafc; --surface: #ffffff; --ink: #1e293b; --ink-body: #334155; --ink-soft: #64748b; --ink-faint: #94a3b8;
-    --rule: #e2e8f0; --rule-soft: #f1f5f9;
-    --blue: #2563eb; --purple: #7c3aed; --teal: #0d9488; --orange: #d97706; --green: #16a34a; --red: #dc2626;
-    --blue-tint: #eff6ff; --purple-tint: #f5f3ff; --teal-tint: #f0fdfa; --orange-tint: #fffbeb; --green-tint: #f0fdf4; --red-tint: #fef2f2;
-    --hero-from: #1e40af; --hero-to: #7c3aed;
-    --code-bg: #1e1e2e; --code-ink: #cdd6f4; --code-green: #a6e3a1; --code-blue: #89b4fa; --code-orange: #fab387; --code-red: #f38ba8; --code-comment: #6c7086;
-    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    --mono: 'SF Mono', 'Fira Code', ui-monospace, Menlo, Consolas, monospace;
-    --radius: 12px; --radius-lg: 16px;
-    --shadow: 0 1px 4px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-    color-scheme: light;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--sans); background: var(--bg); color: var(--ink); line-height: 1.6; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickPoll 1.1 Walkthrough</title>
+  <!-- Styled with claude-skills/references/house-style.html (light, card-based). -->
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --ink: #1e293b;
+      --ink-body: #334155;
+      --ink-soft: #64748b;
+      --ink-faint: #94a3b8;
+      --rule: #e2e8f0;
+      --rule-soft: #f1f5f9;
+      --blue: #2563eb;
+      --purple: #7c3aed;
+      --teal: #0d9488;
+      --orange: #d97706;
+      --green: #16a34a;
+      --red: #dc2626;
+      --blue-tint: #eff6ff;
+      --purple-tint: #f5f3ff;
+      --teal-tint: #f0fdfa;
+      --orange-tint: #fffbeb;
+      --green-tint: #f0fdf4;
+      --red-tint: #fef2f2;
+      --hero-from: #1e40af;
+      --hero-to: #7c3aed;
+      --code-bg: #1e1e2e;
+      --code-ink: #cdd6f4;
+      --code-green: #a6e3a1;
+      --code-blue: #89b4fa;
+      --code-orange: #fab387;
+      --code-red: #f38ba8;
+      --code-comment: #6c7086;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --mono: 'SF Mono', 'Fira Code', ui-monospace, Menlo, Consolas, monospace;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      color-scheme: light;
+    }
 
-  .hero { background: linear-gradient(135deg, var(--hero-from) 0%, var(--hero-to) 100%); color: #fff; padding: 56px 24px; text-align: center; }
-  .hero h1 { font-size: 2.6rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; }
-  .hero p { font-size: 1.15rem; color: rgba(255,255,255,0.92); max-width: 640px; margin: 0 auto 20px; }
-  .chips { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-  .chip { background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  .content { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
-  section { margin-bottom: 64px; scroll-margin-top: 16px; }
-  h2 { font-size: 1.5rem; font-weight: 700; color: var(--ink); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
-  h3 { font-size: 1rem; font-weight: 700; color: #334155; margin: 20px 0 8px; }
-  p { color: var(--ink-body); margin-bottom: 12px; max-width: 78ch; }
-  p:last-child { margin-bottom: 0; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
 
-  code { font-family: var(--mono); background: var(--rule-soft); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; color: var(--ink-body); word-break: break-word; }
-  pre { background: var(--code-bg); color: var(--code-ink); padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-family: var(--mono); font-size: 0.85rem; line-height: 1.7; margin: 12px 0; }
-  pre code { background: none; padding: 0; color: inherit; font-size: inherit; word-break: normal; }
-  a { color: var(--blue); }
-  .t-str { color: var(--code-green); } .t-key { color: var(--code-blue); } .t-val { color: var(--code-orange); } .t-del { color: var(--code-red); } .t-com { color: var(--code-comment); }
+    .hero {
+      background: linear-gradient(135deg, var(--hero-from) 0%, var(--hero-to) 100%);
+      color: #fff;
+      padding: 56px 24px;
+      text-align: center;
+    }
 
-  .grid { display: grid; gap: 16px; }
-  .grid-2 { grid-template-columns: repeat(2, 1fr); }
-  .grid-3 { grid-template-columns: repeat(3, 1fr); }
-  @media (max-width: 760px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } .hero h1 { font-size: 2rem; } }
+    .hero h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
 
-  .feature-card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 24px; }
-  .feature-head { padding: 24px 28px; border-left: 6px solid; display: flex; align-items: flex-start; gap: 18px; }
-  .fc-blue   { border-color: var(--blue);   background: linear-gradient(135deg, var(--blue-tint),   #fff); }
-  .fc-purple { border-color: var(--purple); background: linear-gradient(135deg, var(--purple-tint), #fff); }
-  .fc-teal   { border-color: var(--teal);   background: linear-gradient(135deg, var(--teal-tint),   #fff); }
-  .fc-orange { border-color: var(--orange); background: linear-gradient(135deg, var(--orange-tint), #fff); }
-  .fc-green  { border-color: var(--green);  background: linear-gradient(135deg, var(--green-tint),  #fff); }
-  .fc-red    { border-color: var(--red);    background: linear-gradient(135deg, var(--red-tint),    #fff); }
-  .fc-icon { font-size: 2.2rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
-  .fc-title { font-size: 1.4rem; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
-  .fc-desc { font-size: 0.95rem; color: var(--ink-body); }
-  .feature-body { padding: 20px 28px 24px; }
+    .hero p {
+      font-size: 1.15rem;
+      color: rgba(255, 255, 255, 0.92);
+      max-width: 640px;
+      margin: 0 auto 20px;
+    }
 
-  .edge-card { background: var(--surface); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow-sm); border-top: 4px solid var(--rule); }
-  .ec-blue { border-top-color: var(--blue); } .ec-purple { border-top-color: var(--purple); } .ec-teal { border-top-color: var(--teal); }
-  .ec-orange { border-top-color: var(--orange); } .ec-green { border-top-color: var(--green); } .ec-red { border-top-color: var(--red); }
-  .ec-title { font-size: 0.85rem; font-weight: 700; font-family: var(--mono); color: var(--ink); margin-bottom: 6px; word-break: break-word; }
-  .ec-desc { font-size: 0.85rem; color: var(--ink-soft); line-height: 1.5; }
+    .chips {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
 
-  .badge { display: inline-block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; padding: 3px 10px; border-radius: 20px; }
-  .b-blue { background: #dbeafe; color: #1d4ed8; } .b-purple { background: #ede9fe; color: #6d28d9; } .b-teal { background: #ccfbf1; color: #0f766e; }
-  .b-orange { background: #ffedd5; color: #c2410c; } .b-green { background: #dcfce7; color: #166534; } .b-red { background: #fee2e2; color: #991b1b; }
-  .b-neutral { background: #f3f4f6; color: #374151; } .b-canvas { background: #fde68a; color: #92400e; }
-  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .chip {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
 
-  .arrow-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
-  .arrow-list li { font-size: 0.9rem; color: var(--ink-body); padding-left: 16px; position: relative; line-height: 1.5; }
-  .arrow-list li::before { content: "\2192"; position: absolute; left: 0; color: var(--ink-faint); }
+    .content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
 
-  .note { background: var(--bg); border: 1px solid var(--rule); border-left: 4px solid var(--ink-faint); border-radius: 8px; padding: 14px 18px; font-size: 0.88rem; color: var(--ink-body); }
-  .note strong { color: #374151; }
-  .callout { border-radius: 10px; padding: 18px 22px; border: 1px solid; border-left-width: 4px; font-size: 0.9rem; }
-  .callout p { font-size: 0.9rem; color: inherit; }
-  .callout-warn { background: var(--orange-tint); border-color: #fed7aa; color: #7c2d12; }
-  .callout-warn strong { color: #9a3412; }
-  .callout-ok { background: var(--green-tint); border-color: #bbf7d0; color: #14532d; }
-  .callout-info { background: var(--blue-tint); border-color: #bfdbfe; color: #1e3a8a; }
-  .callout-bad { background: var(--red-tint); border-color: #fecaca; color: #7f1d1d; }
+    section {
+      margin-bottom: 64px;
+      scroll-margin-top: 16px;
+    }
 
-  .phase-box { border: 1.5px solid var(--rule); border-radius: 10px; padding: 12px 16px; }
-  .pb-blue { border-color: #bfdbfe; background: var(--blue-tint); } .pb-purple { border-color: #ddd6fe; background: var(--purple-tint); }
-  .pb-teal { border-color: #99f6e4; background: var(--teal-tint); } .pb-orange { border-color: #fde68a; background: var(--orange-tint); }
-  .pb-green { border-color: #bbf7d0; background: var(--green-tint); }
-  .phase-num { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); margin-bottom: 2px; }
-  .phase-title { font-size: 0.875rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
-  .phase-desc { font-size: 0.82rem; color: var(--ink-body); line-height: 1.45; }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--rule);
+    }
 
-  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 8px; table-layout: fixed; }
-  th { text-align: left; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); padding: 8px 10px; border-bottom: 1px solid var(--rule); }
-  td { padding: 9px 10px; border-bottom: 1px solid var(--rule-soft); color: var(--ink-body); vertical-align: top; line-height: 1.45; word-break: break-word; }
-  td.path { width: 46%; }
-  tr:last-child td { border-bottom: none; }
-  .table-wrap { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 8px 14px; overflow-x: auto; }
-  .table-wrap table { min-width: 560px; }
+    h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #334155;
+      margin: 20px 0 8px;
+    }
 
-  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
-  nav.toc a { font-size: 0.8rem; font-weight: 600; text-decoration: none; color: var(--blue); background: var(--blue-tint); border: 1px solid #bfdbfe; padding: 4px 12px; border-radius: 20px; }
-  nav.toc a:focus-visible, summary:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+    p {
+      color: var(--ink-body);
+      margin-bottom: 12px;
+      max-width: 78ch;
+    }
 
-  .status { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
-  .step { border: 1.5px solid var(--rule); border-radius: 10px; padding: 10px 14px; background: var(--surface); }
-  .step .n { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); }
-  .step .t { font-size: 0.88rem; font-weight: 700; }
-  .step .s { font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; }
-  .step.done { border-color: #bbf7d0; background: var(--green-tint); }
-  .step.skip { border-style: dashed; background: var(--bg); }
-  .step.now { border-color: #fde68a; background: var(--orange-tint); }
+    p:last-child {
+      margin-bottom: 0;
+    }
 
-  details { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; }
-  summary { font-weight: 700; cursor: pointer; }
-  details[open] summary { margin-bottom: 8px; }
-  details p { font-size: 0.9rem; }
+    code {
+      font-family: var(--mono);
+      background: var(--rule-soft);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      color: var(--ink-body);
+      word-break: break-word;
+    }
 
-  figure.diagram { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); margin: 0 0 16px; overflow-x: auto; }
-  figure.diagram svg { width: 100%; min-width: 760px; height: auto; display: block; }
-  figcaption { font-size: 0.82rem; color: var(--ink-soft); margin-top: 8px; }
-  svg .t-h { font-family: var(--sans); font-size: 14px; font-weight: 700; fill: #1e293b; }
-  svg .t-s { font-family: var(--mono); font-size: 11px; fill: #475569; }
-  svg .t-d { font-family: var(--sans); font-size: 12px; fill: #334155; }
-  svg .t-l { font-family: var(--sans); font-size: 12px; font-weight: 700; }
-  svg .bx { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1.5; }
+    pre {
+      background: var(--code-bg);
+      color: var(--code-ink);
+      padding: 18px 22px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      margin: 12px 0;
+    }
 
-  @media print {
-    body { background: #fff; }
-    .feature-card, .edge-card, .note { box-shadow: none; }
-    pre { background: #f5f8fc; color: #1e293b; border: 1px solid var(--rule); white-space: pre-wrap; }
-    details { break-inside: avoid; }
-  }
-</style>
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+      word-break: normal;
+    }
+
+    a {
+      color: var(--blue);
+    }
+
+    .t-str {
+      color: var(--code-green);
+    }
+
+    .t-key {
+      color: var(--code-blue);
+    }
+
+    .t-val {
+      color: var(--code-orange);
+    }
+
+    .t-del {
+      color: var(--code-red);
+    }
+
+    .t-com {
+      color: var(--code-comment);
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 760px) {
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .feature-head {
+      padding: 24px 28px;
+      border-left: 6px solid;
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
+    .fc-blue {
+      border-color: var(--blue);
+      background: linear-gradient(135deg, var(--blue-tint), #fff);
+    }
+
+    .fc-purple {
+      border-color: var(--purple);
+      background: linear-gradient(135deg, var(--purple-tint), #fff);
+    }
+
+    .fc-teal {
+      border-color: var(--teal);
+      background: linear-gradient(135deg, var(--teal-tint), #fff);
+    }
+
+    .fc-orange {
+      border-color: var(--orange);
+      background: linear-gradient(135deg, var(--orange-tint), #fff);
+    }
+
+    .fc-green {
+      border-color: var(--green);
+      background: linear-gradient(135deg, var(--green-tint), #fff);
+    }
+
+    .fc-red {
+      border-color: var(--red);
+      background: linear-gradient(135deg, var(--red-tint), #fff);
+    }
+
+    .fc-icon {
+      font-size: 2.2rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .fc-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .fc-desc {
+      font-size: 0.95rem;
+      color: var(--ink-body);
+    }
+
+    .feature-body {
+      padding: 20px 28px 24px;
+    }
+
+    .edge-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      border-top: 4px solid var(--rule);
+    }
+
+    .ec-blue {
+      border-top-color: var(--blue);
+    }
+
+    .ec-purple {
+      border-top-color: var(--purple);
+    }
+
+    .ec-teal {
+      border-top-color: var(--teal);
+    }
+
+    .ec-orange {
+      border-top-color: var(--orange);
+    }
+
+    .ec-green {
+      border-top-color: var(--green);
+    }
+
+    .ec-red {
+      border-top-color: var(--red);
+    }
+
+    .ec-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: var(--mono);
+      color: var(--ink);
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+
+    .ec-desc {
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .b-blue {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .b-purple {
+      background: #ede9fe;
+      color: #6d28d9;
+    }
+
+    .b-teal {
+      background: #ccfbf1;
+      color: #0f766e;
+    }
+
+    .b-orange {
+      background: #ffedd5;
+      color: #c2410c;
+    }
+
+    .b-green {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .b-red {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .b-neutral {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .b-canvas {
+      background: #fde68a;
+      color: #92400e;
+    }
+
+    .tag-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .arrow-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .arrow-list li {
+      font-size: 0.9rem;
+      color: var(--ink-body);
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .arrow-list li::before {
+      content: "\2192";
+      position: absolute;
+      left: 0;
+      color: var(--ink-faint);
+    }
+
+    .note {
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      border-left: 4px solid var(--ink-faint);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 0.88rem;
+      color: var(--ink-body);
+    }
+
+    .note strong {
+      color: #374151;
+    }
+
+    .callout {
+      border-radius: 10px;
+      padding: 18px 22px;
+      border: 1px solid;
+      border-left-width: 4px;
+      font-size: 0.9rem;
+    }
+
+    .callout p {
+      font-size: 0.9rem;
+      color: inherit;
+    }
+
+    .callout-warn {
+      background: var(--orange-tint);
+      border-color: #fed7aa;
+      color: #7c2d12;
+    }
+
+    .callout-warn strong {
+      color: #9a3412;
+    }
+
+    .callout-ok {
+      background: var(--green-tint);
+      border-color: #bbf7d0;
+      color: #14532d;
+    }
+
+    .callout-info {
+      background: var(--blue-tint);
+      border-color: #bfdbfe;
+      color: #1e3a8a;
+    }
+
+    .callout-bad {
+      background: var(--red-tint);
+      border-color: #fecaca;
+      color: #7f1d1d;
+    }
+
+    .phase-box {
+      border: 1.5px solid var(--rule);
+      border-radius: 10px;
+      padding: 12px 16px;
+    }
+
+    .pb-blue {
+      border-color: #bfdbfe;
+      background: var(--blue-tint);
+    }
+
+    .pb-purple {
+      border-color: #ddd6fe;
+      background: var(--purple-tint);
+    }
+
+    .pb-teal {
+      border-color: #99f6e4;
+      background: var(--teal-tint);
+    }
+
+    .pb-orange {
+      border-color: #fde68a;
+      background: var(--orange-tint);
+    }
+
+    .pb-green {
+      border-color: #bbf7d0;
+      background: var(--green-tint);
+    }
+
+    .phase-num {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+      margin-bottom: 2px;
+    }
+
+    .phase-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .phase-desc {
+      font-size: 0.82rem;
+      color: var(--ink-body);
+      line-height: 1.45;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin-top: 8px;
+      table-layout: fixed;
+    }
+
+    th {
+      text-align: left;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--rule-soft);
+      color: var(--ink-body);
+      vertical-align: top;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    td.path {
+      width: 46%;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-wrap {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 8px 14px;
+      overflow-x: auto;
+    }
+
+    .table-wrap table {
+      min-width: 560px;
+    }
+
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 40px;
+    }
+
+    nav.toc a {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--blue);
+      background: var(--blue-tint);
+      border: 1px solid #bfdbfe;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    nav.toc a:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid var(--orange);
+      outline-offset: 2px;
+    }
+
+    .status {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    .step {
+      border: 1.5px solid var(--rule);
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: var(--surface);
+    }
+
+    .step .n {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+    }
+
+    .step .t {
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .step .s {
+      font-size: 0.72rem;
+      color: var(--ink-soft);
+      margin-top: 2px;
+    }
+
+    .step.done {
+      border-color: #bbf7d0;
+      background: var(--green-tint);
+    }
+
+    .step.skip {
+      border-style: dashed;
+      background: var(--bg);
+    }
+
+    .step.now {
+      border-color: #fde68a;
+      background: var(--orange-tint);
+    }
+
+    details {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+    }
+
+    summary {
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    details[open] summary {
+      margin-bottom: 8px;
+    }
+
+    details p {
+      font-size: 0.9rem;
+    }
+
+    figure.diagram {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      margin: 0 0 16px;
+      overflow-x: auto;
+    }
+
+    figure.diagram svg {
+      width: 100%;
+      min-width: 760px;
+      height: auto;
+      display: block;
+    }
+
+    figcaption {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      margin-top: 8px;
+    }
+
+    svg .t-h {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 700;
+      fill: #1e293b;
+    }
+
+    svg .t-s {
+      font-family: var(--mono);
+      font-size: 11px;
+      fill: #475569;
+    }
+
+    svg .t-d {
+      font-family: var(--sans);
+      font-size: 12px;
+      fill: #334155;
+    }
+
+    svg .t-l {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    svg .bx {
+      fill: #ffffff;
+      stroke: #e2e8f0;
+      stroke-width: 1.5;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .feature-card,
+      .edge-card,
+      .note {
+        box-shadow: none;
+      }
+
+      pre {
+        background: #f5f8fc;
+        color: #1e293b;
+        border: 1px solid var(--rule);
+        white-space: pre-wrap;
+      }
+
+      details {
+        break-inside: avoid;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<header class="hero">
-  <h1>QuickPoll 1.1: How the App Works</h1>
-  <p>A follow-along guide. It traces one real launch from the Canvas click to the Rails controller, then shows how the app checks it and what it saves.</p>
-  <div class="chips">
-    <span class="chip">LTI 1.1</span>
-    <span class="chip">Rails 8 in Docker</span>
-    <span class="chip">Final: Stages 1 to 4</span>
-  </div>
-</header>
+  <header class="hero">
+    <h1>QuickPoll 1.1: How the App Works</h1>
+    <p>A follow-along guide. It traces one real launch from the Canvas click to the Rails
+      controller, then shows how the app checks it and what it saves.</p>
+    <div class="chips">
+      <span class="chip">LTI 1.1</span>
+      <span class="chip">Rails 8 in Docker</span>
+      <span class="chip">Final: Stages 1 to 4</span>
+    </div>
+  </header>
 
-<main class="content">
+  <main class="content">
 
-  <nav class="toc" aria-label="Sections">
-    <a href="#start">Short version</a>
-    <a href="#picture">The picture</a>
-    <a href="#files">Which files matter</a>
-    <a href="#trace">Trace a launch</a>
-    <a href="#code">Read the code</a>
-    <a href="#signature">The signature</a>
-    <a href="#next">What it does now</a>
-    <a href="#database">Database</a>
-    <a href="#versions">1.1 vs 1.3</a>
-    <a href="#vocab">Vocabulary</a>
-    <a href="#gotchas">Gotchas</a>
-    <a href="#run">Run it</a>
-  </nav>
+    <nav class="toc" aria-label="Sections">
+      <a href="#start">Short version</a>
+      <a href="#picture">The picture</a>
+      <a href="#files">Which files matter</a>
+      <a href="#trace">Trace a launch</a>
+      <a href="#code">Read the code</a>
+      <a href="#signature">The signature</a>
+      <a href="#next">What it does now</a>
+      <a href="#database">Database</a>
+      <a href="#versions">1.1 vs 1.3</a>
+      <a href="#vocab">Vocabulary</a>
+      <a href="#gotchas">Gotchas</a>
+      <a href="#run">Run it</a>
+    </nav>
 
-  <section id="start">
-    <h2>The short version</h2>
-    <div class="feature-card">
-      <div class="feature-head fc-blue">
-        <div class="fc-icon">&#x1F9ED;</div>
-        <div>
-          <div class="fc-title">One LTI 1.1 launch is one signed web form</div>
-          <div class="fc-desc">Canvas fills in a form, signs it, and your browser sends it to your app. Your app checks the signature. That is the whole protocol.</div>
+    <section id="start">
+      <h2>The short version</h2>
+      <div class="feature-card">
+        <div class="feature-head fc-blue">
+          <div class="fc-icon">&#x1F9ED;</div>
+          <div>
+            <div class="fc-title">One LTI 1.1 launch is one signed web form</div>
+            <div class="fc-desc">Canvas fills in a form, signs it, and your browser sends it to your
+              app. Your app checks the signature. That is the whole protocol.</div>
+          </div>
+        </div>
+        <div class="feature-body">
+          <ul class="arrow-list">
+            <li>Canvas and your app both know a shared secret. The secret never travels over the
+              network.</li>
+            <li>Canvas runs a math function over the form fields and the URL, using the secret. The
+              result is <code>oauth_signature</code>.</li>
+            <li>Your app runs the same function on what it received. A match means Canvas sent the
+              form and nobody changed it.</li>
+            <li>No match means reject the launch.</li>
+          </ul>
+          <div class="callout callout-ok" style="margin-top:14px;"><strong>The app now checks every
+              launch.</strong> It looks up the consumer key, checks the signature, then checks the
+            timestamp and nonce. Any failure gets a 401. A launch that passes saves the person and
+            the course. A verified launch also starts a session, so the next page knows who you are
+            and whether they may create polls. A verified launch then redirects to the poll page. An
+            instructor or a TA creates polls there. Everyone in the course sees them and votes once
+            per poll. A person sees the counts after voting. A poll creator always sees them. The
+            154 specs pass, and a live launch in the local Canvas works. This app is final. Grade
+            passback and Content-Item were skipped on purpose. Stage 7 became a separate 1.3 app:
+            see <a href="lti-1p1-vs-1p3.html">1.1 versus 1.3 in pictures</a>.</div>
         </div>
       </div>
-      <div class="feature-body">
-        <ul class="arrow-list">
-          <li>Canvas and your app both know a shared secret. The secret never travels over the network.</li>
-          <li>Canvas runs a math function over the form fields and the URL, using the secret. The result is <code>oauth_signature</code>.</li>
-          <li>Your app runs the same function on what it received. A match means Canvas sent the form and nobody changed it.</li>
-          <li>No match means reject the launch.</li>
-        </ul>
-        <div class="callout callout-ok" style="margin-top:14px;"><strong>The app now checks every launch.</strong> It looks up the consumer key, checks the signature, then checks the timestamp and nonce. Any failure gets a 401. A launch that passes saves the person and the course. A verified launch also starts a session, so the next page knows who you are and whether they may create polls. A verified launch then redirects to the poll page. An instructor or a TA creates polls there. Everyone in the course sees them and votes once per poll. A person sees the counts after voting. A poll creator always sees them. The 154 specs pass, and a live launch in the local Canvas works. This app is final. Grade passback and Content-Item were skipped on purpose. Stage 7 became a separate 1.3 app: see <a href="lti-1p1-vs-1p3.html">1.1 versus 1.3 in pictures</a>.</div>
+
+      <h3 id="progress">Where you are</h3>
+      <div class="status" aria-label="Progress">
+        <div class="step done">
+          <div class="n">Stage 1</div>
+          <div class="t">Capture a launch</div>
+          <div class="s">teacher + student</div>
+        </div>
+        <div class="step done">
+          <div class="n">Stage 2</div>
+          <div class="t">Scaffold + config</div>
+          <div class="s">launch reaches the stub</div>
+        </div>
+        <div class="step done">
+          <div class="n">Stage 3</div>
+          <div class="t">Verify the launch</div>
+          <div class="s">signature + replay guard</div>
+        </div>
+        <div class="step done">
+          <div class="n">Stage 4</div>
+          <div class="t">Session + polls</div>
+          <div class="s">records, session, roles, polls, voting</div>
+        </div>
+        <div class="step skip">
+          <div class="n">Stage 5</div>
+          <div class="t">Grade passback</div>
+          <div class="s">skipped</div>
+        </div>
+        <div class="step skip">
+          <div class="n">Stage 6</div>
+          <div class="t">Content-Item</div>
+          <div class="s">skipped</div>
+        </div>
+        <div class="step done">
+          <div class="n">Stage 7</div>
+          <div class="t">Build a 1.3 copy</div>
+          <div class="s">separate app, own database</div>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <h3 id="progress">Where you are</h3>
-    <div class="status" aria-label="Progress">
-      <div class="step done"><div class="n">Stage 1</div><div class="t">Capture a launch</div><div class="s">teacher + student</div></div>
-      <div class="step done"><div class="n">Stage 2</div><div class="t">Scaffold + config</div><div class="s">launch reaches the stub</div></div>
-      <div class="step done"><div class="n">Stage 3</div><div class="t">Verify the launch</div><div class="s">signature + replay guard</div></div>
-      <div class="step done"><div class="n">Stage 4</div><div class="t">Session + polls</div><div class="s">records, session, roles, polls, voting</div></div>
-      <div class="step skip"><div class="n">Stage 5</div><div class="t">Grade passback</div><div class="s">skipped</div></div>
-      <div class="step skip"><div class="n">Stage 6</div><div class="t">Content-Item</div><div class="s">skipped</div></div>
-      <div class="step done"><div class="n">Stage 7</div><div class="t">Build a 1.3 copy</div><div class="s">separate app, own database</div></div>
-    </div>
-  </section>
+    <section id="picture">
+      <h2>The picture: what happens when you click the link</h2>
+      <p>You click <em>QuickPoll 1.1</em> in the course menu. These six things happen, left to
+        right. The blue box is the code you wrote in Stages 3 and 4.</p>
+      <figure class="diagram">
+        <svg viewBox="0 0 1120 150" role="img"
+          aria-label="Launch path: Canvas signs a form, the browser posts it, Traefik and Puma forward it, the router matches it, the launch controller handles it, and a plain text page comes back.">
+          <defs>
+            <marker id="p-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+              orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#94a3b8" />
+            </marker>
+          </defs>
+          <rect class="bx" x="7" y="40" width="156" height="84" rx="10" />
+          <text class="t-h" x="85" y="68" text-anchor="middle">Canvas</text>
+          <text class="t-s" x="85" y="88" text-anchor="middle">course nav link</text>
+          <text class="t-d" x="85" y="106" text-anchor="middle">signs the form</text>
 
-  <section id="picture">
-    <h2>The picture: what happens when you click the link</h2>
-    <p>You click <em>QuickPoll 1.1</em> in the course menu. These six things happen, left to right. The blue box is the code you wrote in Stages 3 and 4.</p>
-    <figure class="diagram">
-      <svg viewBox="0 0 1120 150" role="img" aria-label="Launch path: Canvas signs a form, the browser posts it, Traefik and Puma forward it, the router matches it, the launch controller handles it, and a plain text page comes back.">
-        <defs>
-          <marker id="p-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#94a3b8"/></marker>
-        </defs>
-        <rect class="bx" x="7" y="40" width="156" height="84" rx="10"/>
-        <text class="t-h" x="85" y="68" text-anchor="middle">Canvas</text>
-        <text class="t-s" x="85" y="88" text-anchor="middle">course nav link</text>
-        <text class="t-d" x="85" y="106" text-anchor="middle">signs the form</text>
+          <rect class="bx" x="197" y="40" width="156" height="84" rx="10" />
+          <text class="t-h" x="275" y="68" text-anchor="middle">Browser</text>
+          <text class="t-s" x="275" y="88" text-anchor="middle">inside an iframe</text>
+          <text class="t-d" x="275" y="106" text-anchor="middle">posts the form</text>
 
-        <rect class="bx" x="197" y="40" width="156" height="84" rx="10"/>
-        <text class="t-h" x="275" y="68" text-anchor="middle">Browser</text>
-        <text class="t-s" x="275" y="88" text-anchor="middle">inside an iframe</text>
-        <text class="t-d" x="275" y="106" text-anchor="middle">posts the form</text>
+          <rect class="bx" x="387" y="40" width="156" height="84" rx="10" />
+          <text class="t-h" x="465" y="68" text-anchor="middle">Traefik + Puma</text>
+          <text class="t-s" x="465" y="88" text-anchor="middle">port 80</text>
+          <text class="t-d" x="465" y="106" text-anchor="middle">pass it to Rails</text>
 
-        <rect class="bx" x="387" y="40" width="156" height="84" rx="10"/>
-        <text class="t-h" x="465" y="68" text-anchor="middle">Traefik + Puma</text>
-        <text class="t-s" x="465" y="88" text-anchor="middle">port 80</text>
-        <text class="t-d" x="465" y="106" text-anchor="middle">pass it to Rails</text>
+          <rect class="bx" x="577" y="40" width="156" height="84" rx="10" />
+          <text class="t-h" x="655" y="68" text-anchor="middle">Router</text>
+          <text class="t-s" x="655" y="88" text-anchor="middle">routes.rb:6</text>
+          <text class="t-d" x="655" y="106" text-anchor="middle">matches the path</text>
 
-        <rect class="bx" x="577" y="40" width="156" height="84" rx="10"/>
-        <text class="t-h" x="655" y="68" text-anchor="middle">Router</text>
-        <text class="t-s" x="655" y="88" text-anchor="middle">routes.rb:6</text>
-        <text class="t-d" x="655" y="106" text-anchor="middle">matches the path</text>
+          <text class="t-l" x="845" y="30" text-anchor="middle" fill="#d97706">You built this</text>
+          <rect x="767" y="40" width="156" height="84" rx="10" fill="#eff6ff" stroke="#2563eb"
+            stroke-width="2.5" />
+          <text class="t-h" x="845" y="68" text-anchor="middle">LaunchController</text>
+          <text class="t-s" x="845" y="88" text-anchor="middle">launch_controller.rb:5</text>
+          <text class="t-d" x="845" y="106" text-anchor="middle">#create</text>
 
-        <text class="t-l" x="845" y="30" text-anchor="middle" fill="#d97706">You built this</text>
-        <rect x="767" y="40" width="156" height="84" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5"/>
-        <text class="t-h" x="845" y="68" text-anchor="middle">LaunchController</text>
-        <text class="t-s" x="845" y="88" text-anchor="middle">launch_controller.rb:5</text>
-        <text class="t-d" x="845" y="106" text-anchor="middle">#create</text>
+          <rect class="bx" x="957" y="40" width="156" height="84" rx="10" />
+          <text class="t-h" x="1035" y="68" text-anchor="middle">Redirect</text>
+          <text class="t-s" x="1035" y="88" text-anchor="middle">303, 400, or 401</text>
+          <text class="t-d" x="1035" y="106" text-anchor="middle">poll page in the iframe</text>
 
-        <rect class="bx" x="957" y="40" width="156" height="84" rx="10"/>
-        <text class="t-h" x="1035" y="68" text-anchor="middle">Redirect</text>
-        <text class="t-s" x="1035" y="88" text-anchor="middle">303, 400, or 401</text>
-        <text class="t-d" x="1035" y="106" text-anchor="middle">poll page in the iframe</text>
+          <line x1="163" y1="82" x2="195" y2="82" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#p-ar)" />
+          <text class="t-d" x="179" y="74" text-anchor="middle"
+            style="font-size:11px;fill:#64748b">form</text>
+          <line x1="353" y1="82" x2="385" y2="82" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#p-ar)" />
+          <text class="t-d" x="369" y="74" text-anchor="middle"
+            style="font-size:11px;fill:#64748b">POST</text>
+          <line x1="543" y1="82" x2="575" y2="82" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#p-ar)" />
+          <text class="t-d" x="559" y="74" text-anchor="middle"
+            style="font-size:11px;fill:#64748b">proxy</text>
+          <line x1="733" y1="82" x2="765" y2="82" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#p-ar)" />
+          <text class="t-d" x="749" y="74" text-anchor="middle"
+            style="font-size:11px;fill:#64748b">match</text>
+          <line x1="923" y1="82" x2="955" y2="82" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#p-ar)" />
+          <text class="t-d" x="939" y="74" text-anchor="middle"
+            style="font-size:11px;fill:#64748b">text</text>
+        </svg>
+        <figcaption>The browser sends the form, not the Canvas server. The spec defines a launch as
+          a browser POST. I did not read how Canvas builds the page that holds the form.
+        </figcaption>
+      </figure>
+    </section>
 
-        <line x1="163" y1="82" x2="195" y2="82" stroke="#94a3b8" stroke-width="2" marker-end="url(#p-ar)"/>
-        <text class="t-d" x="179" y="74" text-anchor="middle" style="font-size:11px;fill:#64748b">form</text>
-        <line x1="353" y1="82" x2="385" y2="82" stroke="#94a3b8" stroke-width="2" marker-end="url(#p-ar)"/>
-        <text class="t-d" x="369" y="74" text-anchor="middle" style="font-size:11px;fill:#64748b">POST</text>
-        <line x1="543" y1="82" x2="575" y2="82" stroke="#94a3b8" stroke-width="2" marker-end="url(#p-ar)"/>
-        <text class="t-d" x="559" y="74" text-anchor="middle" style="font-size:11px;fill:#64748b">proxy</text>
-        <line x1="733" y1="82" x2="765" y2="82" stroke="#94a3b8" stroke-width="2" marker-end="url(#p-ar)"/>
-        <text class="t-d" x="749" y="74" text-anchor="middle" style="font-size:11px;fill:#64748b">match</text>
-        <line x1="923" y1="82" x2="955" y2="82" stroke="#94a3b8" stroke-width="2" marker-end="url(#p-ar)"/>
-        <text class="t-d" x="939" y="74" text-anchor="middle" style="font-size:11px;fill:#64748b">text</text>
-      </svg>
-      <figcaption>The browser sends the form, not the Canvas server. The spec defines a launch as a browser POST. I did not read how Canvas builds the page that holds the form.</figcaption>
-    </figure>
-  </section>
+    <section id="files">
+      <h2>Which files matter</h2>
+      <p><code>rails new</code> made well over 100 files. You need to read about 10. Everything else
+        is scaffolding you can ignore for now: <code>bin/</code>, most of <code>config/</code>,
+        <code>app/javascript/</code>, <code>app/views/layouts/</code>, <code>public/</code>, and
+        <code>.github/</code>.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>What it does</th>
+              <th>Stage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="path"><code>config/routes.rb</code></td>
+              <td><strong>The entry point.</strong> Maps a URL to a controller method.</td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/controllers/lti/base_controller.rb</code></td>
+              <td>Shared setup for LTI endpoints: CSRF off, iframe allowed. Also
+                <code>current_lti_user</code>, <code>current_lti_context</code>,
+                <code>require_launch</code>, and <code>can_create_polls?</code>.</td>
+              <td>2, 4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/controllers/lti/launch_controller.rb</code></td>
+              <td>Receives the launch. Runs the three checks, saves the records, starts the session,
+                redirects to the poll page (303). Answers 400 or 401 on a failure.</td>
+              <td>2, 3, 4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/controllers/lti/sessions_controller.rb</code></td>
+              <td><code>GET /lti/me</code>. A stand-in page that says who the session belongs to and
+                whether they may create polls or only vote. The poll pages replace it.</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/controllers/lti/configuration_controller.rb</code></td>
+              <td>Builds the XML you pasted into Canvas.</td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/views/lti/configuration/show.xml.erb</code></td>
+              <td>The XML template.</td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td class="path"><code>config/initializers/lti.rb</code></td>
+              <td>Reads <code>PUBLIC_BASE_URL</code>. The signature check needs it.</td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/models/*.rb</code> and <code>db/migrate/*.rb</code></td>
+              <td>Six tables. A launch writes three of them. The poll page writes
+                <code>polls</code>. A vote writes <code>votes</code>.</td>
+              <td>2, 3, 4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>Dockerfile</code> and <code>docker-compose.yml</code></td>
+              <td>Run the app and join the Canvas network.</td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/services/lti1p1/signature_verifier.rb</code></td>
+              <td>Recomputes the OAuth signature and compares it. 19 specs.</td>
+              <td>3</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/services/lti1p1/replay_guard.rb</code></td>
+              <td>Rejects an old timestamp or a repeated nonce. Saves the nonce. 15 specs.</td>
+              <td>3</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/services/lti1p1/launch_records.rb</code></td>
+              <td>Finds or creates the <code>LtiUser</code> and <code>LtiContext</code> for a
+                launch. 14 specs.</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/controllers/lti/polls_controller.rb</code></td>
+              <td><code>GET /lti/polls</code> lists the polls of the course.
+                <code>POST /lti/polls</code> creates one. Only an instructor or a TA may create.
+                Forgery protection is on.</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/controllers/lti/votes_controller.rb</code></td>
+              <td><code>POST /lti/polls/:poll_id/votes</code>. Finds the poll in the launched course
+                only (404 otherwise). The voter comes from the session. One vote per person per
+                poll. Always redirects back with 303.</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/views/lti/polls/index.html.erb</code></td>
+              <td>The poll page: who you are, the polls, a vote form or the counts, and the New poll
+                form for poll creators.</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>app/services/lti1p1/roles.rb</code></td>
+              <td>Reads <code>roles</code> and <code>ext_roles</code>, keeps the text after the last
+                <code>/</code>, and answers <code>instructor?</code>, <code>learner?</code>,
+                <code>teaching_assistant?</code>, and <code>can_create_polls?</code>. 25 specs.</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>spec/support/signed_launches.rb</code></td>
+              <td>Shared helper. Signs a fake launch so request specs can POST one.</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>spec/requests/lti_launch_spec.rb</code></td>
+              <td>The launch endpoint end to end: accept, reject, save records.</td>
+              <td>3, 4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>spec/requests/lti_polls_spec.rb</code></td>
+              <td>The poll page: who sees the form, who may create, the course comes from the
+                session, errors, forgery protection.</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>spec/requests/lti_votes_spec.rb</code></td>
+              <td>Voting: one vote per person, counts after voting, the course and the voter come
+                from the session, forgery protection.</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td class="path"><code>spec/requests/lti_roles_session_spec.rb</code></td>
+              <td>A launch stores the poll-creator answer in the session. <code>/lti/me</code> shows
+                it.</td>
+              <td>4</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-  <section id="files">
-    <h2>Which files matter</h2>
-    <p><code>rails new</code> made well over 100 files. You need to read about 10. Everything else is scaffolding you can ignore for now: <code>bin/</code>, most of <code>config/</code>, <code>app/javascript/</code>, <code>app/views/layouts/</code>, <code>public/</code>, and <code>.github/</code>.</p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>File</th><th>What it does</th><th>Stage</th></tr></thead>
-        <tbody>
-          <tr><td class="path"><code>config/routes.rb</code></td><td><strong>The entry point.</strong> Maps a URL to a controller method.</td><td>2</td></tr>
-          <tr><td class="path"><code>app/controllers/lti/base_controller.rb</code></td><td>Shared setup for LTI endpoints: CSRF off, iframe allowed. Also <code>current_lti_user</code>, <code>current_lti_context</code>, <code>require_launch</code>, and <code>can_create_polls?</code>.</td><td>2, 4</td></tr>
-          <tr><td class="path"><code>app/controllers/lti/launch_controller.rb</code></td><td>Receives the launch. Runs the three checks, saves the records, starts the session, redirects to the poll page (303). Answers 400 or 401 on a failure.</td><td>2, 3, 4</td></tr>
-          <tr><td class="path"><code>app/controllers/lti/sessions_controller.rb</code></td><td><code>GET /lti/me</code>. A stand-in page that says who the session belongs to and whether they may create polls or only vote. The poll pages replace it.</td><td>4</td></tr>
-          <tr><td class="path"><code>app/controllers/lti/configuration_controller.rb</code></td><td>Builds the XML you pasted into Canvas.</td><td>2</td></tr>
-          <tr><td class="path"><code>app/views/lti/configuration/show.xml.erb</code></td><td>The XML template.</td><td>2</td></tr>
-          <tr><td class="path"><code>config/initializers/lti.rb</code></td><td>Reads <code>PUBLIC_BASE_URL</code>. The signature check needs it.</td><td>2</td></tr>
-          <tr><td class="path"><code>app/models/*.rb</code> and <code>db/migrate/*.rb</code></td><td>Six tables. A launch writes three of them. The poll page writes <code>polls</code>. A vote writes <code>votes</code>.</td><td>2, 3, 4</td></tr>
-          <tr><td class="path"><code>Dockerfile</code> and <code>docker-compose.yml</code></td><td>Run the app and join the Canvas network.</td><td>2</td></tr>
-          <tr><td class="path"><code>app/services/lti1p1/signature_verifier.rb</code></td><td>Recomputes the OAuth signature and compares it. 19 specs.</td><td>3</td></tr>
-          <tr><td class="path"><code>app/services/lti1p1/replay_guard.rb</code></td><td>Rejects an old timestamp or a repeated nonce. Saves the nonce. 15 specs.</td><td>3</td></tr>
-          <tr><td class="path"><code>app/services/lti1p1/launch_records.rb</code></td><td>Finds or creates the <code>LtiUser</code> and <code>LtiContext</code> for a launch. 14 specs.</td><td>4</td></tr>
-          <tr><td class="path"><code>app/controllers/lti/polls_controller.rb</code></td><td><code>GET /lti/polls</code> lists the polls of the course. <code>POST /lti/polls</code> creates one. Only an instructor or a TA may create. Forgery protection is on.</td><td>4</td></tr>
-          <tr><td class="path"><code>app/controllers/lti/votes_controller.rb</code></td><td><code>POST /lti/polls/:poll_id/votes</code>. Finds the poll in the launched course only (404 otherwise). The voter comes from the session. One vote per person per poll. Always redirects back with 303.</td><td>4</td></tr>
-          <tr><td class="path"><code>app/views/lti/polls/index.html.erb</code></td><td>The poll page: who you are, the polls, a vote form or the counts, and the New poll form for poll creators.</td><td>4</td></tr>
-          <tr><td class="path"><code>app/services/lti1p1/roles.rb</code></td><td>Reads <code>roles</code> and <code>ext_roles</code>, keeps the text after the last <code>/</code>, and answers <code>instructor?</code>, <code>learner?</code>, <code>teaching_assistant?</code>, and <code>can_create_polls?</code>. 25 specs.</td><td>4</td></tr>
-          <tr><td class="path"><code>spec/support/signed_launches.rb</code></td><td>Shared helper. Signs a fake launch so request specs can POST one.</td><td>4</td></tr>
-          <tr><td class="path"><code>spec/requests/lti_launch_spec.rb</code></td><td>The launch endpoint end to end: accept, reject, save records.</td><td>3, 4</td></tr>
-          <tr><td class="path"><code>spec/requests/lti_polls_spec.rb</code></td><td>The poll page: who sees the form, who may create, the course comes from the session, errors, forgery protection.</td><td>4</td></tr>
-          <tr><td class="path"><code>spec/requests/lti_votes_spec.rb</code></td><td>Voting: one vote per person, counts after voting, the course and the voter come from the session, forgery protection.</td><td>4</td></tr>
-          <tr><td class="path"><code>spec/requests/lti_roles_session_spec.rb</code></td><td>A launch stores the poll-creator answer in the session. <code>/lti/me</code> shows it.</td><td>4</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+    <section id="trace">
+      <h2>Trace a real launch</h2>
+      <p>This is your first launch from Canvas, in order, as it ran at the end of Stage 2. Each step
+        names the place where it happens. Steps 1 to 4 have not changed. Steps 5 and 6 are different
+        today: see <a href="#next">What it does now</a>.</p>
+      <div class="grid grid-3">
+        <div class="phase-box pb-blue">
+          <div class="phase-num">Step 1</div>
+          <div class="phase-title">Install, once</div>
+          <div class="phase-desc">You pasted the XML into Canvas. Canvas stored the launch URL and
+            the <code>course_navigation</code> placement. That is why the menu link exists.</div>
+        </div>
+        <div class="phase-box pb-purple">
+          <div class="phase-num">Step 2</div>
+          <div class="phase-title">You click the link</div>
+          <div class="phase-desc">Canvas builds a form with about 40 fields, plus the signature. The
+            browser sends it as a POST.</div>
+        </div>
+        <div class="phase-box pb-teal">
+          <div class="phase-num">Step 3</div>
+          <div class="phase-title">Network</div>
+          <div class="phase-desc"><code>quickpoll-1p1.inseng.test</code> resolves to Traefik. A
+            <code>Host</code> rule in <code>docker-compose.yml</code> sends it to the
+            <code>web</code> container on port 80.</div>
+        </div>
+        <div class="phase-box pb-orange">
+          <div class="phase-num">Step 4</div>
+          <div class="phase-title">Puma and the router</div>
+          <div class="phase-desc">Puma is the Rails web server. Rails reads
+            <code>routes.rb:6</code>, which maps <code>POST /lti/launch</code> to
+            <code>launch#create</code>.</div>
+        </div>
+        <div class="phase-box pb-blue">
+          <div class="phase-num">Step 5</div>
+          <div class="phase-title">The controller</div>
+          <div class="phase-desc"><code>BaseController</code> turns off CSRF and removes
+            <code>X-Frame-Options</code>. Then, in Stage 2, <code>create</code> logged the params
+            and rendered them as text.</div>
+        </div>
+        <div class="phase-box pb-green">
+          <div class="phase-num">Step 6</div>
+          <div class="phase-title">The response</div>
+          <div class="phase-desc">The text showed in the iframe. The log said
+            <code>0 queries</code>: the Stage 2 stub never touched the database.</div>
+        </div>
+      </div>
 
-  <section id="trace">
-    <h2>Trace a real launch</h2>
-    <p>This is your first launch from Canvas, in order, as it ran at the end of Stage 2. Each step names the place where it happens. Steps 1 to 4 have not changed. Steps 5 and 6 are different today: see <a href="#next">What it does now</a>.</p>
-    <div class="grid grid-3">
-      <div class="phase-box pb-blue"><div class="phase-num">Step 1</div><div class="phase-title">Install, once</div><div class="phase-desc">You pasted the XML into Canvas. Canvas stored the launch URL and the <code>course_navigation</code> placement. That is why the menu link exists.</div></div>
-      <div class="phase-box pb-purple"><div class="phase-num">Step 2</div><div class="phase-title">You click the link</div><div class="phase-desc">Canvas builds a form with about 40 fields, plus the signature. The browser sends it as a POST.</div></div>
-      <div class="phase-box pb-teal"><div class="phase-num">Step 3</div><div class="phase-title">Network</div><div class="phase-desc"><code>quickpoll-1p1.inseng.test</code> resolves to Traefik. A <code>Host</code> rule in <code>docker-compose.yml</code> sends it to the <code>web</code> container on port 80.</div></div>
-      <div class="phase-box pb-orange"><div class="phase-num">Step 4</div><div class="phase-title">Puma and the router</div><div class="phase-desc">Puma is the Rails web server. Rails reads <code>routes.rb:6</code>, which maps <code>POST /lti/launch</code> to <code>launch#create</code>.</div></div>
-      <div class="phase-box pb-blue"><div class="phase-num">Step 5</div><div class="phase-title">The controller</div><div class="phase-desc"><code>BaseController</code> turns off CSRF and removes <code>X-Frame-Options</code>. Then, in Stage 2, <code>create</code> logged the params and rendered them as text.</div></div>
-      <div class="phase-box pb-green"><div class="phase-num">Step 6</div><div class="phase-title">The response</div><div class="phase-desc">The text showed in the iframe. The log said <code>0 queries</code>: the Stage 2 stub never touched the database.</div></div>
-    </div>
-
-    <h3>What the log showed (Stage 2)</h3>
-    <pre><code><span class="t-com"># docker compose logs web   (from the Stage 2 stub, which rendered text. The launch now redirects with 303.)</span>
+      <h3>What the log showed (Stage 2)</h3>
+      <pre><code><span class="t-com"># docker compose logs web   (from the Stage 2 stub, which rendered text. The launch now redirects with 303.)</span>
 Started POST <span class="t-str">"/lti/launch?placement=course_navigation"</span> for 172.18.0.1
 Processing by <span class="t-key">Lti::LaunchController#create</span> as HTML
   Parameters: {"oauth_consumer_key" =&gt; "[FILTERED]", "oauth_timestamp" =&gt; "1794256411", ... }
 [lti launch] {"oauth_consumer_key":"key", ... , "oauth_signature":"ymSk...bgY="}
   Rendering text template
 Completed <span class="t-val">200 OK</span> in 19ms (Views: 2.1ms | ActiveRecord: <span class="t-val">0.0ms (0 queries</span>, 0 cached))</code></pre>
-    <div class="callout callout-info"><strong>Look at the first line.</strong> The URL ends in <code>?placement=course_navigation</code>. The <code>[lti launch]</code> line prints only the POST body, and it also holds <code>placement</code>. So Canvas sent that value twice. It signed it once. The verifier handles this today. See <a href="#gotchas">Gotchas</a>.</div>
-  </section>
+      <div class="callout callout-info"><strong>Look at the first line.</strong> The URL ends in
+        <code>?placement=course_navigation</code>. The <code>[lti launch]</code> line prints only
+        the POST body, and it also holds <code>placement</code>. So Canvas sent that value twice. It
+        signed it once. The verifier handles this today. See <a href="#gotchas">Gotchas</a>.</div>
+    </section>
 
-  <section id="code">
-    <h2>Read the code</h2>
-    <p>Open each block in turn. The request path is the controller plus three small service classes.</p>
+    <section id="code">
+      <h2>Read the code</h2>
+      <p>Open each block in turn. The request path is the controller plus three small service
+        classes.</p>
 
-    <details open>
-      <summary>1. <code>config/routes.rb</code> (lines 4 to 7): the entry point</summary>
-<pre><code><span class="t-key">namespace</span> :lti <span class="t-key">do</span>
+      <details open>
+        <summary>1. <code>config/routes.rb</code> (lines 4 to 7): the entry point</summary>
+        <pre><code><span class="t-key">namespace</span> :lti <span class="t-key">do</span>
   <span class="t-key">get</span>  <span class="t-str">"config"</span>, to: <span class="t-str">"configuration#show"</span>, defaults: { format: :xml }, as: :configuration
   <span class="t-key">post</span> <span class="t-str">"launch"</span>, to: <span class="t-str">"launch#create"</span>, as: :launch   <span class="t-com"># line 6: the launch lands here</span>
 <span class="t-key">end</span></code></pre>
-      <p><code>namespace :lti</code> adds <code>/lti</code> to the URL and <code>Lti::</code> to the controller name. So <code>post "launch"</code> becomes <code>POST /lti/launch</code> and <code>Lti::LaunchController#create</code>. The second route, <code>GET /lti/config</code>, serves the XML.</p>
-    </details>
+        <p><code>namespace :lti</code> adds <code>/lti</code> to the URL and <code>Lti::</code> to
+          the controller name. So <code>post "launch"</code> becomes <code>POST /lti/launch</code>
+          and <code>Lti::LaunchController#create</code>. The second route,
+          <code>GET /lti/config</code>, serves the XML.</p>
+      </details>
 
-    <details open>
-      <summary>2. <code>app/controllers/lti/base_controller.rb</code>: shared setup</summary>
-<pre><code><span class="t-key">class</span> BaseController &lt; ApplicationController
+      <details open>
+        <summary>2. <code>app/controllers/lti/base_controller.rb</code>: shared setup</summary>
+        <pre><code><span class="t-key">class</span> BaseController &lt; ApplicationController
   <span class="t-key">skip_forgery_protection</span>          <span class="t-com"># Canvas cannot send a Rails CSRF token</span>
   <span class="t-key">before_action</span> :allow_framing   <span class="t-com"># before, not after: see Gotchas</span>
 
@@ -353,12 +1160,16 @@ Completed <span class="t-val">200 OK</span> in 19ms (Views: 2.1ms | ActiveRecord
     <span class="t-key">end</span>
   <span class="t-key">end</span>
 <span class="t-key">end</span></code></pre>
-      <p>Rails normally rejects a POST that lacks its own CSRF token. That would block every launch. The signature replaces the CSRF token as the proof of origin. Skipping CSRF is safe because <code>LaunchController</code> checks the signature before it does anything.</p>
-    </details>
+        <p>Rails normally rejects a POST that lacks its own CSRF token. That would block every
+          launch. The signature replaces the CSRF token as the proof of origin. Skipping CSRF is
+          safe because <code>LaunchController</code> checks the signature before it does anything.
+        </p>
+      </details>
 
-    <details open>
-      <summary>3. <code>app/controllers/lti/launch_controller.rb</code>: check, then save</summary>
-<pre><code><span class="t-key">class</span> LaunchController &lt; BaseController
+      <details open>
+        <summary>3. <code>app/controllers/lti/launch_controller.rb</code>: check, then save
+        </summary>
+        <pre><code><span class="t-key">class</span> LaunchController &lt; BaseController
   <span class="t-key">before_action</span> :verify_launch          <span class="t-com"># runs the three checks first</span>
 
   <span class="t-key">def</span> create                           <span class="t-com"># only reached if every check passed</span>
@@ -398,476 +1209,925 @@ Completed <span class="t-val">200 OK</span> in 19ms (Views: 2.1ms | ActiveRecord
     render plain: <span class="t-str">"Launch rejected."</span>, status: :unauthorized
   <span class="t-key">end</span>
 <span class="t-key">end</span></code></pre>
-      <p>The session is a signed, encrypted cookie. After a verified launch it holds two ids. A later request reads them back through <code>current_lti_user</code>. <code>reset_session</code> comes first, so a cookie planted before the launch dies (session fixation). A <code>before_action</code> that calls <code>render</code> ends the request. So a failed check answers 401 and <code>create</code> never runs. The order matters: the signature check comes before the guard, so a forged launch cannot save a nonce. The 401 text is the same for every failure. The reason goes to the log only, and never the launch values (student data).</p>
-    </details>
+        <p>The session is a signed, encrypted cookie. After a verified launch it holds two ids. A
+          later request reads them back through <code>current_lti_user</code>.
+          <code>reset_session</code> comes first, so a cookie planted before the launch dies
+          (session fixation). A <code>before_action</code> that calls <code>render</code> ends the
+          request. So a failed check answers 401 and <code>create</code> never runs. The order
+          matters: the signature check comes before the guard, so a forged launch cannot save a
+          nonce. The 401 text is the same for every failure. The reason goes to the log only, and
+          never the launch values (student data).</p>
+      </details>
 
-    <details>
-      <summary>4. The three services in <code>app/services/lti1p1/</code></summary>
-      <div class="grid grid-3">
-        <div class="edge-card ec-blue"><div class="ec-title">SignatureVerifier</div><div class="ec-desc"><code>new(method:, url:, params:, secret:)</code>, then <code>valid?</code>. It builds the base string, signs it, and compares with <code>secure_compare</code>. <code>normalized_url</code> lowercases the scheme and host, drops a default port, and drops the query. <code>all_params</code> merges the URL query with the body and counts an identical pair once.</div></div>
-        <div class="edge-card ec-red"><div class="ec-title">ReplayGuard</div><div class="ec-desc"><code>new(consumer:, params:)</code>, then <code>accept?</code>. It checks the params exist, the timestamp is within 300 seconds either way, and the nonce is new. Then it inserts the nonce. The unique index decides a race between two launches.</div></div>
-        <div class="edge-card ec-purple"><div class="ec-title">LaunchRecords</div><div class="ec-desc"><code>new(consumer:, params:)</code>, then <code>call</code>. It needs <code>user_id</code> and <code>context_id</code>. It finds or creates the user and the course in one transaction. A blank name or title never erases a saved one.</div></div>
-      </div>
-      <p>All three take plain Ruby arguments, not the Rails request. That is why each has its own spec file and none needs a browser.</p>
-    </details>
+      <details>
+        <summary>4. The three services in <code>app/services/lti1p1/</code></summary>
+        <div class="grid grid-3">
+          <div class="edge-card ec-blue">
+            <div class="ec-title">SignatureVerifier</div>
+            <div class="ec-desc"><code>new(method:, url:, params:, secret:)</code>, then
+              <code>valid?</code>. It builds the base string, signs it, and compares with
+              <code>secure_compare</code>. <code>normalized_url</code> lowercases the scheme and
+              host, drops a default port, and drops the query. <code>all_params</code> merges the
+              URL query with the body and counts an identical pair once.</div>
+          </div>
+          <div class="edge-card ec-red">
+            <div class="ec-title">ReplayGuard</div>
+            <div class="ec-desc"><code>new(consumer:, params:)</code>, then <code>accept?</code>. It
+              checks the params exist, the timestamp is within 300 seconds either way, and the nonce
+              is new. Then it inserts the nonce. The unique index decides a race between two
+              launches.</div>
+          </div>
+          <div class="edge-card ec-purple">
+            <div class="ec-title">LaunchRecords</div>
+            <div class="ec-desc"><code>new(consumer:, params:)</code>, then <code>call</code>. It
+              needs <code>user_id</code> and <code>context_id</code>. It finds or creates the user
+              and the course in one transaction. A blank name or title never erases a saved one.
+            </div>
+          </div>
+        </div>
+        <p>All three take plain Ruby arguments, not the Rails request. That is why each has its own
+          spec file and none needs a browser.</p>
+      </details>
 
-    <details>
-      <summary>5. <code>app/controllers/lti/configuration_controller.rb</code> and the XML template</summary>
-<pre><code><span class="t-key">def</span> show
+      <details>
+        <summary>5. <code>app/controllers/lti/configuration_controller.rb</code> and the XML
+          template</summary>
+        <pre><code><span class="t-key">def</span> show
   base = Rails.configuration.x.public_base_url   <span class="t-com"># "http://quickpoll-1p1.inseng.test"</span>
   @launch_url = <span class="t-str">"#{base}/lti/launch"</span>
   @placement  = <span class="t-str">"course_navigation"</span>
   render formats: :xml
 <span class="t-key">end</span></code></pre>
-      <p>The template fills <code>&lt;blti:launch_url&gt;</code> and the placement URL from those values. Canvas reads the XML once, at install time. <code>PUBLIC_BASE_URL</code> comes from <code>docker-compose.yml</code>, through <code>config/initializers/lti.rb</code>.</p>
-    </details>
+        <p>The template fills <code>&lt;blti:launch_url&gt;</code> and the placement URL from those
+          values. Canvas reads the XML once, at install time. <code>PUBLIC_BASE_URL</code> comes
+          from <code>docker-compose.yml</code>, through <code>config/initializers/lti.rb</code>.</p>
+      </details>
 
-    <details>
-      <summary>6. <code>config/initializers/lti.rb</code>: why the base URL is configured</summary>
-<pre><code>Rails.configuration.x.public_base_url = ENV.fetch(<span class="t-str">"PUBLIC_BASE_URL"</span>, <span class="t-str">"http://localhost:3000"</span>)</code></pre>
-      <p>Canvas signs the exact URL it posts to, including <code>http</code> versus <code>https</code>. A proxy can change the scheme before Rails sees it, so <code>request.url</code> is unreliable. The controller builds the URL from this setting instead.</p>
-    </details>
-  </section>
+      <details>
+        <summary>6. <code>config/initializers/lti.rb</code>: why the base URL is configured
+        </summary>
+        <pre><code>Rails.configuration.x.public_base_url = ENV.fetch(<span class="t-str">"PUBLIC_BASE_URL"</span>, <span class="t-str">"http://localhost:3000"</span>)</code></pre>
+        <p>Canvas signs the exact URL it posts to, including <code>http</code> versus
+          <code>https</code>. A proxy can change the scheme before Rails sees it, so
+          <code>request.url</code> is unreliable. The controller builds the URL from this setting
+          instead.</p>
+      </details>
+    </section>
 
-  <section id="signature">
-    <h2>The signature, step by step</h2>
-    <p>This is Stage 3. First see what goes in, then what comes out, then how the code does it.</p>
+    <section id="signature">
+      <h2>The signature, step by step</h2>
+      <p>This is Stage 3. First see what goes in, then what comes out, then how the code does it.
+      </p>
 
-    <div class="grid grid-3">
-      <div class="edge-card ec-blue"><div class="ec-title">Ingredient 1: the secret</div><div class="ec-desc">The text <code>secret</code>. Canvas and your app both store it. The consumer key (<code>key</code>) tells your app which secret to use.</div></div>
-      <div class="edge-card ec-purple"><div class="ec-title">Ingredient 2: the fields</div><div class="ec-desc">All 40 form fields from the teacher launch you captured. The signature field itself is left out.</div></div>
-      <div class="edge-card ec-teal"><div class="ec-title">Ingredient 3: the URL</div><div class="ec-desc">The exact launch URL, with no query string. The scheme and host count.</div></div>
-    </div>
-
-    <h3>The pipeline</h3>
-    <figure class="diagram">
-      <svg viewBox="0 0 1120 150" role="img" aria-label="Signature pipeline: launch params, encode and sort, build the base string, HMAC-SHA1 with the secret, Base64, then compare to oauth_signature.">
-        <defs>
-          <marker id="s-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#94a3b8"/></marker>
-        </defs>
-        <rect x="187" y="32" width="746" height="104" rx="14" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="7 5"/>
-        <text class="t-l" x="199" y="26" fill="#2563eb">Lti1p1::SignatureVerifier (Stage 3, done)</text>
-
-        <rect class="bx" x="7" y="48" width="156" height="72" rx="10"/>
-        <text class="t-h" x="85" y="76" text-anchor="middle">Launch fields</text>
-        <text class="t-d" x="85" y="98" text-anchor="middle">40, minus the signature</text>
-
-        <rect class="bx" x="197" y="48" width="156" height="72" rx="10"/>
-        <text class="t-h" x="275" y="76" text-anchor="middle">Encode and sort</text>
-        <text class="t-d" x="275" y="98" text-anchor="middle">RFC 3986, by name</text>
-
-        <rect class="bx" x="387" y="48" width="156" height="72" rx="10"/>
-        <text class="t-h" x="465" y="76" text-anchor="middle">Base string</text>
-        <text class="t-s" x="465" y="98" text-anchor="middle">POST&amp;url&amp;fields</text>
-
-        <rect class="bx" x="577" y="48" width="156" height="72" rx="10"/>
-        <text class="t-h" x="655" y="76" text-anchor="middle">HMAC-SHA1</text>
-        <text class="t-s" x="655" y="98" text-anchor="middle">key = secret&amp;</text>
-
-        <rect class="bx" x="767" y="48" width="156" height="72" rx="10"/>
-        <text class="t-h" x="845" y="76" text-anchor="middle">Base64</text>
-        <text class="t-d" x="845" y="98" text-anchor="middle">28 characters</text>
-
-        <rect x="957" y="48" width="156" height="72" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
-        <text class="t-h" x="1035" y="76" text-anchor="middle">Compare</text>
-        <text class="t-d" x="1035" y="98" text-anchor="middle">to oauth_signature</text>
-
-        <line x1="163" y1="84" x2="195" y2="84" stroke="#94a3b8" stroke-width="2" marker-end="url(#s-ar)"/>
-        <line x1="353" y1="84" x2="385" y2="84" stroke="#94a3b8" stroke-width="2" marker-end="url(#s-ar)"/>
-        <line x1="543" y1="84" x2="575" y2="84" stroke="#94a3b8" stroke-width="2" marker-end="url(#s-ar)"/>
-        <line x1="733" y1="84" x2="765" y2="84" stroke="#94a3b8" stroke-width="2" marker-end="url(#s-ar)"/>
-        <line x1="923" y1="84" x2="955" y2="84" stroke="#94a3b8" stroke-width="2" marker-end="url(#s-ar)"/>
-      </svg>
-      <figcaption>Canvas ran this pipeline to make <code>oauth_signature</code>. Your app runs it again and checks that both results match.</figcaption>
-    </figure>
-
-    <h3>A real base string</h3>
-    <p>This is the start of the base string for your teacher launch. It is 2,037 characters long. The final Base64 result is <code>or/QpB5OBHAK/E70QdKbeDz9EQw=</code>, the same value Canvas sent.</p>
-    <pre><code>POST&amp;https%3A%2F%2Flti-1p1-test-tool.vercel.app%2Flaunch&amp;context_id%3D4dde05e8ca1973bcca9bffc13e1548820eee93a3
-%26context_label%3DTest%25201%26context_title%3DTest%2520Course%25201%26custom_canvas_api_domain%3D...</code></pre>
-    <p>The text is encoded twice. Once when each field is written as <code>name=value</code>, and again when the whole field list goes into the base string.</p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Piece</th><th>After the first encode</th><th>Inside the base string</th></tr></thead>
-        <tbody>
-          <tr><td>The value <code>Test 1</code></td><td><code>Test%201</code></td><td><code>Test%25201</code></td></tr>
-          <tr><td>The <code>=</code> between name and value</td><td><code>=</code></td><td><code>%3D</code></td></tr>
-          <tr><td>The <code>&amp;</code> between fields</td><td><code>&amp;</code></td><td><code>%26</code></td></tr>
-          <tr><td>The URL</td><td>not part of the field list</td><td><code>https%3A%2F%2Flti-1p1-test-tool.vercel.app%2Flaunch</code></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Check your understanding</h3>
-    <details><summary>Why does <code>Test 1</code> become <code>Test%25201</code>?</summary><p>Encoding the space gives <code>%20</code>. The second encode turns the <code>%</code> into <code>%25</code>, so <code>%20</code> becomes <code>%2520</code>.</p></details>
-    <details><summary>A proxy changes <code>https</code> to <code>http</code> before Rails sees the request. Which URL should the verifier use?</summary><p>The one built from <code>PUBLIC_BASE_URL</code>. Canvas signed the <code>https</code> URL. If you rebuild it from <code>request.url</code>, the scheme differs, and every valid launch fails.</p></details>
-    <details><summary>Someone replays a valid captured launch 10 minutes later. What stops it?</summary><p>The timestamp check stops it: the launch is older than 5 minutes. Inside the 5 minutes, the nonce check stops it, because the first launch already saved that nonce. Both are in <code>Lti1p1::ReplayGuard</code>, and both run after the signature check.</p></details>
-
-    <div class="feature-card" style="margin-top:24px;">
-      <div class="feature-head fc-green">
-        <div class="fc-icon">&#x2705;</div>
-        <div>
-          <div class="fc-title">Stage 3 is done</div>
-          <div class="fc-desc"><code>SignatureVerifier</code> (19 examples) and <code>ReplayGuard</code> (15 examples) pass, and a real Canvas launch passes through them.</div>
+      <div class="grid grid-3">
+        <div class="edge-card ec-blue">
+          <div class="ec-title">Ingredient 1: the secret</div>
+          <div class="ec-desc">The text <code>secret</code>. Canvas and your app both store it. The
+            consumer key (<code>key</code>) tells your app which secret to use.</div>
+        </div>
+        <div class="edge-card ec-purple">
+          <div class="ec-title">Ingredient 2: the fields</div>
+          <div class="ec-desc">All 40 form fields from the teacher launch you captured. The
+            signature field itself is left out.</div>
+        </div>
+        <div class="edge-card ec-teal">
+          <div class="ec-title">Ingredient 3: the URL</div>
+          <div class="ec-desc">The exact launch URL, with no query string. The scheme and host
+            count.</div>
         </div>
       </div>
-      <div class="feature-body">
+
+      <h3>The pipeline</h3>
+      <figure class="diagram">
+        <svg viewBox="0 0 1120 150" role="img"
+          aria-label="Signature pipeline: launch params, encode and sort, build the base string, HMAC-SHA1 with the secret, Base64, then compare to oauth_signature.">
+          <defs>
+            <marker id="s-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+              orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#94a3b8" />
+            </marker>
+          </defs>
+          <rect x="187" y="32" width="746" height="104" rx="14" fill="none" stroke="#2563eb"
+            stroke-width="1.5" stroke-dasharray="7 5" />
+          <text class="t-l" x="199" y="26" fill="#2563eb">Lti1p1::SignatureVerifier (Stage 3,
+            done)</text>
+
+          <rect class="bx" x="7" y="48" width="156" height="72" rx="10" />
+          <text class="t-h" x="85" y="76" text-anchor="middle">Launch fields</text>
+          <text class="t-d" x="85" y="98" text-anchor="middle">40, minus the signature</text>
+
+          <rect class="bx" x="197" y="48" width="156" height="72" rx="10" />
+          <text class="t-h" x="275" y="76" text-anchor="middle">Encode and sort</text>
+          <text class="t-d" x="275" y="98" text-anchor="middle">RFC 3986, by name</text>
+
+          <rect class="bx" x="387" y="48" width="156" height="72" rx="10" />
+          <text class="t-h" x="465" y="76" text-anchor="middle">Base string</text>
+          <text class="t-s" x="465" y="98" text-anchor="middle">POST&amp;url&amp;fields</text>
+
+          <rect class="bx" x="577" y="48" width="156" height="72" rx="10" />
+          <text class="t-h" x="655" y="76" text-anchor="middle">HMAC-SHA1</text>
+          <text class="t-s" x="655" y="98" text-anchor="middle">key = secret&amp;</text>
+
+          <rect class="bx" x="767" y="48" width="156" height="72" rx="10" />
+          <text class="t-h" x="845" y="76" text-anchor="middle">Base64</text>
+          <text class="t-d" x="845" y="98" text-anchor="middle">28 characters</text>
+
+          <rect x="957" y="48" width="156" height="72" rx="10" fill="#f0fdf4" stroke="#16a34a"
+            stroke-width="1.5" />
+          <text class="t-h" x="1035" y="76" text-anchor="middle">Compare</text>
+          <text class="t-d" x="1035" y="98" text-anchor="middle">to oauth_signature</text>
+
+          <line x1="163" y1="84" x2="195" y2="84" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#s-ar)" />
+          <line x1="353" y1="84" x2="385" y2="84" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#s-ar)" />
+          <line x1="543" y1="84" x2="575" y2="84" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#s-ar)" />
+          <line x1="733" y1="84" x2="765" y2="84" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#s-ar)" />
+          <line x1="923" y1="84" x2="955" y2="84" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#s-ar)" />
+        </svg>
+        <figcaption>Canvas ran this pipeline to make <code>oauth_signature</code>. Your app runs it
+          again and checks that both results match.</figcaption>
+      </figure>
+
+      <h3>A real base string</h3>
+      <p>This is the start of the base string for your teacher launch. It is 2,037 characters long.
+        The final Base64 result is <code>or/QpB5OBHAK/E70QdKbeDz9EQw=</code>, the same value Canvas
+        sent.</p>
+      <pre><code>POST&amp;https%3A%2F%2Flti-1p1-test-tool.vercel.app%2Flaunch&amp;context_id%3D4dde05e8ca1973bcca9bffc13e1548820eee93a3
+%26context_label%3DTest%25201%26context_title%3DTest%2520Course%25201%26custom_canvas_api_domain%3D...</code></pre>
+      <p>The text is encoded twice. Once when each field is written as <code>name=value</code>, and
+        again when the whole field list goes into the base string.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Piece</th>
+              <th>After the first encode</th>
+              <th>Inside the base string</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>The value <code>Test 1</code></td>
+              <td><code>Test%201</code></td>
+              <td><code>Test%25201</code></td>
+            </tr>
+            <tr>
+              <td>The <code>=</code> between name and value</td>
+              <td><code>=</code></td>
+              <td><code>%3D</code></td>
+            </tr>
+            <tr>
+              <td>The <code>&amp;</code> between fields</td>
+              <td><code>&amp;</code></td>
+              <td><code>%26</code></td>
+            </tr>
+            <tr>
+              <td>The URL</td>
+              <td>not part of the field list</td>
+              <td><code>https%3A%2F%2Flti-1p1-test-tool.vercel.app%2Flaunch</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Check your understanding</h3>
+      <details>
+        <summary>Why does <code>Test 1</code> become <code>Test%25201</code>?</summary>
+        <p>Encoding the space gives <code>%20</code>. The second encode turns the <code>%</code>
+          into <code>%25</code>, so <code>%20</code> becomes <code>%2520</code>.</p>
+      </details>
+      <details>
+        <summary>A proxy changes <code>https</code> to <code>http</code> before Rails sees the
+          request. Which URL should the verifier use?</summary>
+        <p>The one built from <code>PUBLIC_BASE_URL</code>. Canvas signed the <code>https</code>
+          URL. If you rebuild it from <code>request.url</code>, the scheme differs, and every valid
+          launch fails.</p>
+      </details>
+      <details>
+        <summary>Someone replays a valid captured launch 10 minutes later. What stops it?</summary>
+        <p>The timestamp check stops it: the launch is older than 5 minutes. Inside the 5 minutes,
+          the nonce check stops it, because the first launch already saved that nonce. Both are in
+          <code>Lti1p1::ReplayGuard</code>, and both run after the signature check.</p>
+      </details>
+
+      <div class="feature-card" style="margin-top:24px;">
+        <div class="feature-head fc-green">
+          <div class="fc-icon">&#x2705;</div>
+          <div>
+            <div class="fc-title">Stage 3 is done</div>
+            <div class="fc-desc"><code>SignatureVerifier</code> (19 examples) and
+              <code>ReplayGuard</code> (15 examples) pass, and a real Canvas launch passes through
+              them.</div>
+          </div>
+        </div>
+        <div class="feature-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Group in the verifier spec</th>
+                  <th>Examples</th>
+                  <th>What it proves</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>.percent_encode</code></td>
+                  <td>3</td>
+                  <td>Only <code>A-Z a-z 0-9 - . _ ~</code> stay as they are. Everything else
+                    becomes uppercase <code>%XX</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>#base_string</code></td>
+                  <td>4</td>
+                  <td>Method, URL, and sorted fields join correctly. Empty values stay in.</td>
+                </tr>
+                <tr>
+                  <td><code>#valid?</code></td>
+                  <td>12</td>
+                  <td>Real teacher and student launches pass. Tampering, a wrong secret, a wrong
+                    scheme, and a missing signature fail.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <pre><code><span class="t-com"># from a shell inside the container (webbashc), or: docker compose run --rm web rspec</span>
+rspec spec/services</code></pre>
+          <div class="note"><strong>The timing-safe compare.</strong> <code>valid?</code> uses
+            <code>ActiveSupport::SecurityUtils.secure_compare</code>, not <code>==</code>. A plain
+            <code>==</code> stops at the first different character, and an attacker can measure that
+            time. No spec can catch this mistake.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="next">
+      <h2>What the launch does now</h2>
+      <p>This diagram shows the launch handler. Solid outlines are built and have specs. Dashed
+        outlines are planned. Read it top to bottom. A diamond is a yes-or-no check.</p>
+      <figure class="diagram">
+        <svg viewBox="0 0 1000 910" role="img"
+          aria-label="Planned launch handler. A launch POST passes four checks: known consumer key, matching signature, fresh timestamp, unused nonce. Any failure returns 401. A pass finds or creates the user and course, then branches on instructor to a poll admin page or a vote page.">
+          <defs>
+            <marker id="d-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+              orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#94a3b8" />
+            </marker>
+            <marker id="d-ar-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7"
+              markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#16a34a" />
+            </marker>
+            <marker id="d-ar-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7"
+              markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#dc2626" />
+            </marker>
+          </defs>
+
+          <rect class="bx" x="120" y="10" width="420" height="56" rx="10" />
+          <text class="t-h" x="330" y="34" text-anchor="middle">Canvas POSTs the launch form</text>
+          <text class="t-s" x="330" y="53" text-anchor="middle">POST /lti/launch
+            (routes.rb:6)</text>
+          <line x1="330" y1="66" x2="330" y2="100" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#d-ar)" />
+
+          <rect x="100" y="84" width="490" height="598" rx="14" fill="none" stroke="#2563eb"
+            stroke-width="1.5" stroke-dasharray="7 5" />
+          <text class="t-l" x="114" y="79" fill="#2563eb">Built: verify, save, session</text>
+
+          <!-- D1 -->
+          <polygon points="330,100 500,145 330,190 160,145" fill="#ffffff" stroke="#e2e8f0"
+            stroke-width="1.5" />
+          <text class="t-h" x="330" y="141" text-anchor="middle">Is the consumer</text>
+          <text class="t-h" x="330" y="158" text-anchor="middle">key known?</text>
+          <line x1="500" y1="145" x2="608" y2="145" stroke="#dc2626" stroke-width="2"
+            marker-end="url(#d-ar-r)" />
+          <text class="t-l" x="554" y="137" text-anchor="middle" fill="#dc2626">no</text>
+          <rect x="610" y="120" width="340" height="50" rx="10" fill="#fef2f2" stroke="#dc2626"
+            stroke-width="1.5" />
+          <text class="t-h" x="780" y="142" text-anchor="middle">Reject: 401</text>
+          <text class="t-d" x="780" y="160" text-anchor="middle">no row in lti_consumers</text>
+          <line x1="330" y1="190" x2="330" y2="228" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#d-ar)" />
+          <text class="t-l" x="344" y="214" fill="#16a34a">yes</text>
+
+          <!-- D2 -->
+          <polygon points="330,228 500,273 330,318 160,273" fill="#ffffff" stroke="#e2e8f0"
+            stroke-width="1.5" />
+          <text class="t-h" x="330" y="269" text-anchor="middle">Does the signature</text>
+          <text class="t-h" x="330" y="286" text-anchor="middle">match?</text>
+          <line x1="500" y1="273" x2="608" y2="273" stroke="#dc2626" stroke-width="2"
+            marker-end="url(#d-ar-r)" />
+          <text class="t-l" x="554" y="265" text-anchor="middle" fill="#dc2626">no</text>
+          <rect x="610" y="248" width="340" height="50" rx="10" fill="#fef2f2" stroke="#dc2626"
+            stroke-width="1.5" />
+          <text class="t-h" x="780" y="270" text-anchor="middle">Reject: 401</text>
+          <text class="t-d" x="780" y="288" text-anchor="middle">forged or changed launch</text>
+          <line x1="330" y1="318" x2="330" y2="356" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#d-ar)" />
+          <text class="t-l" x="344" y="342" fill="#16a34a">yes</text>
+
+          <!-- D3 -->
+          <polygon points="330,356 500,401 330,446 160,401" fill="#ffffff" stroke="#e2e8f0"
+            stroke-width="1.5" />
+          <text class="t-h" x="330" y="397" text-anchor="middle">Is the timestamp</text>
+          <text class="t-h" x="330" y="414" text-anchor="middle">within 5 minutes?</text>
+          <line x1="500" y1="401" x2="608" y2="401" stroke="#dc2626" stroke-width="2"
+            marker-end="url(#d-ar-r)" />
+          <text class="t-l" x="554" y="393" text-anchor="middle" fill="#dc2626">no</text>
+          <rect x="610" y="376" width="340" height="50" rx="10" fill="#fef2f2" stroke="#dc2626"
+            stroke-width="1.5" />
+          <text class="t-h" x="780" y="398" text-anchor="middle">Reject: 401</text>
+          <text class="t-d" x="780" y="416" text-anchor="middle">old or future launch</text>
+          <line x1="330" y1="446" x2="330" y2="484" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#d-ar)" />
+          <text class="t-l" x="344" y="470" fill="#16a34a">yes</text>
+
+          <!-- D4 -->
+          <polygon points="330,484 500,529 330,574 160,529" fill="#ffffff" stroke="#e2e8f0"
+            stroke-width="1.5" />
+          <text class="t-h" x="330" y="525" text-anchor="middle">Is the nonce</text>
+          <text class="t-h" x="330" y="542" text-anchor="middle">unused?</text>
+          <line x1="500" y1="529" x2="608" y2="529" stroke="#dc2626" stroke-width="2"
+            marker-end="url(#d-ar-r)" />
+          <text class="t-l" x="554" y="521" text-anchor="middle" fill="#dc2626">no</text>
+          <rect x="610" y="504" width="340" height="50" rx="10" fill="#fef2f2" stroke="#dc2626"
+            stroke-width="1.5" />
+          <text class="t-h" x="780" y="526" text-anchor="middle">Reject: 401</text>
+          <text class="t-d" x="780" y="544" text-anchor="middle">replay (row in used_nonces)</text>
+          <line x1="330" y1="574" x2="330" y2="612" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#d-ar)" />
+          <text class="t-l" x="344" y="602" fill="#16a34a">yes</text>
+
+          <!-- find or create -->
+          <rect x="120" y="612" width="420" height="56" rx="10" fill="#eff6ff" stroke="#2563eb"
+            stroke-width="2.5" />
+          <text class="t-h" x="330" y="636" text-anchor="middle">Find or create the user and
+            course</text>
+          <text class="t-s" x="330" y="655" text-anchor="middle">lti_users, lti_contexts</text>
+          <text class="t-l" x="604" y="646" fill="#16a34a">Built (LaunchRecords)</text>
+          <text class="t-l" x="344" y="694" fill="#16a34a">built: ids saved in the session</text>
+          <line x1="330" y1="668" x2="330" y2="706" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#d-ar)" />
+
+          <!-- D5 -->
+          <polygon points="330,706 500,751 330,796 160,751" fill="#ffffff" stroke="#94a3b8"
+            stroke-width="1.5" stroke-dasharray="6 4" />
+          <text class="t-h" x="330" y="747" text-anchor="middle">Is the user an</text>
+          <text class="t-h" x="330" y="764" text-anchor="middle">instructor?</text>
+          <line x1="500" y1="751" x2="608" y2="751" stroke="#16a34a" stroke-width="2"
+            marker-end="url(#d-ar-g)" />
+          <text class="t-l" x="554" y="743" text-anchor="middle" fill="#16a34a">yes</text>
+          <rect x="610" y="726" width="340" height="50" rx="10" fill="#f0fdf4" stroke="#16a34a"
+            stroke-width="1.5" stroke-dasharray="6 4" />
+          <text class="t-h" x="780" y="748" text-anchor="middle">Poll admin page</text>
+          <text class="t-d" x="780" y="766" text-anchor="middle">create polls, see results</text>
+          <line x1="330" y1="796" x2="330" y2="834" stroke="#94a3b8" stroke-width="2"
+            marker-end="url(#d-ar)" />
+          <text class="t-l" x="344" y="820" fill="#64748b">no</text>
+          <rect x="120" y="834" width="420" height="56" rx="10" fill="#f0fdf4" stroke="#16a34a"
+            stroke-width="1.5" stroke-dasharray="6 4" />
+          <text class="t-h" x="330" y="858" text-anchor="middle">Vote page</text>
+          <text class="t-d" x="330" y="877" text-anchor="middle">a student votes once per
+            poll</text>
+        </svg>
+        <figcaption>A launch with a valid signature but no <code>user_id</code> or
+          <code>context_id</code> gets 400 at the find-or-create step. The role check
+          (<code>Lti1p1::Roles</code>) reads <code>roles</code> and <code>ext_roles</code>. Canvas
+          sends them in two shapes, so see the role note in Gotchas.</figcaption>
+      </figure>
+
+      <h3 id="database">How the six tables relate</h3>
+      <p>Every table hangs off <code>lti_consumers</code>, because a <code>user_id</code> or
+        <code>context_id</code> is only unique inside one Canvas installation. Polls and votes point
+        at <code>lti_users</code> by internal id. Read each line from the <strong>1</strong> end
+        (the parent) to the <strong>N</strong> end (the many children).</p>
+      <figure class="diagram">
+        <svg viewBox="0 0 1000 850" role="img"
+          aria-label="Entity relationship diagram. lti_consumers has many lti_users, lti_contexts, and used_nonces. lti_contexts has many polls. lti_users has many polls as creator and many votes. polls has many votes.">
+          <path d="M365,93 H165 V250" fill="none" stroke="#94a3b8" stroke-width="2" />
+          <text class="t-l" x="350" y="86" fill="#475569">1</text>
+          <text class="t-l" x="172" y="243" fill="#475569">N</text>
+          <path d="M500,166 V250" fill="none" stroke="#94a3b8" stroke-width="2" />
+          <text class="t-l" x="508" y="184" fill="#475569">1</text>
+          <text class="t-l" x="508" y="243" fill="#475569">N</text>
+          <path d="M635,93 H835 V250" fill="none" stroke="#94a3b8" stroke-width="2" />
+          <text class="t-l" x="642" y="86" fill="#475569">1</text>
+          <text class="t-l" x="842" y="243" fill="#475569">N</text>
+          <path d="M835,396 V563 H635" fill="none" stroke="#94a3b8" stroke-width="2" />
+          <text class="t-l" x="842" y="414" fill="#475569">1</text>
+          <text class="t-l" x="643" y="556" fill="#475569">N</text>
+          <text class="t-s" x="845" y="480" fill="#64748b">lti_context_id</text>
+          <path d="M215,396 V563 H365" fill="none" stroke="#94a3b8" stroke-width="2" />
+          <text class="t-l" x="222" y="414" fill="#475569">1</text>
+          <text class="t-l" x="350" y="556" fill="#475569">N</text>
+          <text class="t-s" x="225" y="500" fill="#64748b">creator_id</text>
+          <path d="M500,636 V700" fill="none" stroke="#94a3b8" stroke-width="2" />
+          <text class="t-l" x="508" y="654" fill="#475569">1</text>
+          <text class="t-l" x="508" y="693" fill="#475569">N</text>
+          <text class="t-s" x="520" y="672" fill="#64748b">poll_id</text>
+          <path d="M110,396 V762 H365" fill="none" stroke="#94a3b8" stroke-width="2" />
+          <text class="t-l" x="118" y="414" fill="#475569">1</text>
+          <text class="t-l" x="350" y="755" fill="#475569">N</text>
+          <text class="t-s" x="120" y="600" fill="#64748b">lti_user_id</text>
+          <rect x="365" y="20" width="270" height="146" rx="10" fill="#ffffff" />
+          <path d="M365,50 V30 a10,10 0 0 1 10,-10 H625 a10,10 0 0 1 10,10 V50 z" fill="#eff6ff" />
+          <rect x="365" y="20" width="270" height="146" rx="10" fill="none" stroke="#2563eb"
+            stroke-width="1.5" />
+          <line x1="365" y1="50" x2="635" y2="50" stroke="#2563eb" stroke-width="1" />
+          <text class="t-h" x="500.0" y="40" text-anchor="middle"
+            style="font-family:var(--mono)">lti_consumers</text>
+          <text class="t-l" x="375" y="66" style="font-size:10px" fill="#d97706">PK</text>
+          <text class="t-s" x="401" y="66" style="fill:#1e293b">id</text>
+          <text class="t-d" x="625" y="66" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-s" x="401" y="88" style="fill:#1e293b">name</text>
+          <text class="t-d" x="625" y="88" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">string</text>
+          <text class="t-l" x="375" y="110" style="font-size:10px" fill="#16a34a">UQ</text>
+          <text class="t-s" x="401" y="110" style="fill:#1e293b">consumer_key</text>
+          <text class="t-d" x="625" y="110" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">string</text>
+          <text class="t-s" x="401" y="132" style="fill:#1e293b">shared_secret</text>
+          <text class="t-d" x="625" y="132" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">string</text>
+          <text class="t-s" x="401" y="154" style="fill:#1e293b">instance_guid</text>
+          <text class="t-d" x="625" y="154" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">string, null ok</text>
+          <rect x="30" y="250" width="270" height="146" rx="10" fill="#ffffff" />
+          <path d="M30,280 V260 a10,10 0 0 1 10,-10 H290 a10,10 0 0 1 10,10 V280 z"
+            fill="#f5f3ff" />
+          <rect x="30" y="250" width="270" height="146" rx="10" fill="none" stroke="#7c3aed"
+            stroke-width="1.5" />
+          <line x1="30" y1="280" x2="300" y2="280" stroke="#7c3aed" stroke-width="1" />
+          <text class="t-h" x="165.0" y="270" text-anchor="middle"
+            style="font-family:var(--mono)">lti_users</text>
+          <text class="t-l" x="40" y="296" style="font-size:10px" fill="#d97706">PK</text>
+          <text class="t-s" x="66" y="296" style="fill:#1e293b">id</text>
+          <text class="t-d" x="290" y="296" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-l" x="40" y="318" style="font-size:10px" fill="#7c3aed">FK</text>
+          <text class="t-s" x="66" y="318" style="fill:#1e293b">lti_consumer_id</text>
+          <text class="t-d" x="290" y="318" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-s" x="66" y="340" style="fill:#1e293b">lti1p1_user_id</text>
+          <text class="t-d" x="290" y="340" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">string</text>
+          <text class="t-s" x="66" y="362" style="fill:#1e293b">lti1p3_sub</text>
+          <text class="t-d" x="290" y="362" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">string, null ok</text>
+          <text class="t-s" x="66" y="384" style="fill:#1e293b">name</text>
+          <text class="t-d" x="290" y="384" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">string, null ok</text>
+          <rect x="365" y="250" width="270" height="124" rx="10" fill="#ffffff" />
+          <path d="M365,280 V260 a10,10 0 0 1 10,-10 H625 a10,10 0 0 1 10,10 V280 z"
+            fill="#fef2f2" />
+          <rect x="365" y="250" width="270" height="124" rx="10" fill="none" stroke="#dc2626"
+            stroke-width="1.5" />
+          <line x1="365" y1="280" x2="635" y2="280" stroke="#dc2626" stroke-width="1" />
+          <text class="t-h" x="500.0" y="270" text-anchor="middle"
+            style="font-family:var(--mono)">used_nonces</text>
+          <text class="t-l" x="375" y="296" style="font-size:10px" fill="#d97706">PK</text>
+          <text class="t-s" x="401" y="296" style="fill:#1e293b">id</text>
+          <text class="t-d" x="625" y="296" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-l" x="375" y="318" style="font-size:10px" fill="#7c3aed">FK</text>
+          <text class="t-s" x="401" y="318" style="fill:#1e293b">lti_consumer_id</text>
+          <text class="t-d" x="625" y="318" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-s" x="401" y="340" style="fill:#1e293b">nonce</text>
+          <text class="t-d" x="625" y="340" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">string</text>
+          <text class="t-s" x="401" y="362" style="fill:#1e293b">oauth_timestamp</text>
+          <text class="t-d" x="625" y="362" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <rect x="700" y="250" width="270" height="146" rx="10" fill="#ffffff" />
+          <path d="M700,280 V260 a10,10 0 0 1 10,-10 H960 a10,10 0 0 1 10,10 V280 z"
+            fill="#f0fdfa" />
+          <rect x="700" y="250" width="270" height="146" rx="10" fill="none" stroke="#0d9488"
+            stroke-width="1.5" />
+          <line x1="700" y1="280" x2="970" y2="280" stroke="#0d9488" stroke-width="1" />
+          <text class="t-h" x="835.0" y="270" text-anchor="middle"
+            style="font-family:var(--mono)">lti_contexts</text>
+          <text class="t-l" x="710" y="296" style="font-size:10px" fill="#d97706">PK</text>
+          <text class="t-s" x="736" y="296" style="fill:#1e293b">id</text>
+          <text class="t-d" x="960" y="296" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-l" x="710" y="318" style="font-size:10px" fill="#7c3aed">FK</text>
+          <text class="t-s" x="736" y="318" style="fill:#1e293b">lti_consumer_id</text>
+          <text class="t-d" x="960" y="318" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-s" x="736" y="340" style="fill:#1e293b">context_id</text>
+          <text class="t-d" x="960" y="340" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">string</text>
+          <text class="t-s" x="736" y="362" style="fill:#1e293b">title</text>
+          <text class="t-d" x="960" y="362" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">string, null ok</text>
+          <text class="t-s" x="736" y="384" style="fill:#1e293b">label</text>
+          <text class="t-d" x="960" y="384" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">string, null ok</text>
+          <rect x="365" y="490" width="270" height="146" rx="10" fill="#ffffff" />
+          <path d="M365,520 V500 a10,10 0 0 1 10,-10 H625 a10,10 0 0 1 10,10 V520 z"
+            fill="#fffbeb" />
+          <rect x="365" y="490" width="270" height="146" rx="10" fill="none" stroke="#d97706"
+            stroke-width="1.5" />
+          <line x1="365" y1="520" x2="635" y2="520" stroke="#d97706" stroke-width="1" />
+          <text class="t-h" x="500.0" y="510" text-anchor="middle"
+            style="font-family:var(--mono)">polls</text>
+          <text class="t-l" x="375" y="536" style="font-size:10px" fill="#d97706">PK</text>
+          <text class="t-s" x="401" y="536" style="fill:#1e293b">id</text>
+          <text class="t-d" x="625" y="536" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-l" x="375" y="558" style="font-size:10px" fill="#7c3aed">FK</text>
+          <text class="t-s" x="401" y="558" style="fill:#1e293b">lti_context_id</text>
+          <text class="t-d" x="625" y="558" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-l" x="375" y="580" style="font-size:10px" fill="#7c3aed">FK</text>
+          <text class="t-s" x="401" y="580" style="fill:#1e293b">creator_id</text>
+          <text class="t-d" x="625" y="580" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-s" x="401" y="602" style="fill:#1e293b">question</text>
+          <text class="t-d" x="625" y="602" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">text</text>
+          <text class="t-s" x="401" y="624" style="fill:#1e293b">options</text>
+          <text class="t-d" x="625" y="624" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">jsonb</text>
+          <rect x="365" y="700" width="270" height="124" rx="10" fill="#ffffff" />
+          <path d="M365,730 V710 a10,10 0 0 1 10,-10 H625 a10,10 0 0 1 10,10 V730 z"
+            fill="#f0fdf4" />
+          <rect x="365" y="700" width="270" height="124" rx="10" fill="none" stroke="#16a34a"
+            stroke-width="1.5" />
+          <line x1="365" y1="730" x2="635" y2="730" stroke="#16a34a" stroke-width="1" />
+          <text class="t-h" x="500.0" y="720" text-anchor="middle"
+            style="font-family:var(--mono)">votes</text>
+          <text class="t-l" x="375" y="746" style="font-size:10px" fill="#d97706">PK</text>
+          <text class="t-s" x="401" y="746" style="fill:#1e293b">id</text>
+          <text class="t-d" x="625" y="746" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-l" x="375" y="768" style="font-size:10px" fill="#7c3aed">FK</text>
+          <text class="t-s" x="401" y="768" style="fill:#1e293b">poll_id</text>
+          <text class="t-d" x="625" y="768" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-l" x="375" y="790" style="font-size:10px" fill="#7c3aed">FK</text>
+          <text class="t-s" x="401" y="790" style="fill:#1e293b">lti_user_id</text>
+          <text class="t-d" x="625" y="790" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">bigint</text>
+          <text class="t-s" x="401" y="812" style="fill:#1e293b">option_index</text>
+          <text class="t-d" x="625" y="812" text-anchor="end"
+            style="font-size:10.5px;fill:#64748b">integer</text>
+        </svg>
+        <figcaption><span style="color:#d97706;font-weight:700">PK</span> primary key. <span
+            style="color:#7c3aed;font-weight:700">FK</span> foreign key. <span
+            style="color:#16a34a;font-weight:700">UQ</span> unique on its own. Every table also has
+          <code>created_at</code> and <code>updated_at</code>, which the diagram leaves out. A
+          launch is not saved. The session keeps three things: the user id, the course id, and the
+          can-create-polls answer.</figcaption>
+      </figure>
+
+      <div class="grid" style="grid-template-columns:1fr;">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Group in the verifier spec</th><th>Examples</th><th>What it proves</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Child table</th>
+                <th>Column</th>
+                <th>Points at</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td><code>.percent_encode</code></td><td>3</td><td>Only <code>A-Z a-z 0-9 - . _ ~</code> stay as they are. Everything else becomes uppercase <code>%XX</code>.</td></tr>
-              <tr><td><code>#base_string</code></td><td>4</td><td>Method, URL, and sorted fields join correctly. Empty values stay in.</td></tr>
-              <tr><td><code>#valid?</code></td><td>12</td><td>Real teacher and student launches pass. Tampering, a wrong secret, a wrong scheme, and a missing signature fail.</td></tr>
+              <tr>
+                <td><code>lti_users</code></td>
+                <td><code>lti_consumer_id</code></td>
+                <td><code>lti_consumers</code></td>
+              </tr>
+              <tr>
+                <td><code>lti_contexts</code></td>
+                <td><code>lti_consumer_id</code></td>
+                <td><code>lti_consumers</code></td>
+              </tr>
+              <tr>
+                <td><code>used_nonces</code></td>
+                <td><code>lti_consumer_id</code></td>
+                <td><code>lti_consumers</code></td>
+              </tr>
+              <tr>
+                <td><code>polls</code></td>
+                <td><code>lti_context_id</code></td>
+                <td><code>lti_contexts</code></td>
+              </tr>
+              <tr>
+                <td><code>polls</code></td>
+                <td><code>creator_id</code></td>
+                <td><code>lti_users</code></td>
+              </tr>
+              <tr>
+                <td><code>votes</code></td>
+                <td><code>poll_id</code></td>
+                <td><code>polls</code></td>
+              </tr>
+              <tr>
+                <td><code>votes</code></td>
+                <td><code>lti_user_id</code></td>
+                <td><code>lti_users</code></td>
+              </tr>
             </tbody>
           </table>
         </div>
-        <pre><code><span class="t-com"># from a shell inside the container (webbashc), or: docker compose run --rm web rspec</span>
-rspec spec/services</code></pre>
-        <div class="note"><strong>The timing-safe compare.</strong> <code>valid?</code> uses <code>ActiveSupport::SecurityUtils.secure_compare</code>, not <code>==</code>. A plain <code>==</code> stops at the first different character, and an attacker can measure that time. No spec can catch this mistake.</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Unique rule</th>
+                <th>What it stops</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>consumer_key</code></td>
+                <td>Two installations sharing a key.</td>
+              </tr>
+              <tr>
+                <td><code>(lti_consumer_id, lti1p1_user_id)</code></td>
+                <td>One person getting two rows.</td>
+              </tr>
+              <tr>
+                <td><code>(lti_consumer_id, lti1p3_sub)</code>, only when set</td>
+                <td>Two rows claiming the same 1.3 identity. The 1.3 app uses it with the platform
+                  in place of the consumer.</td>
+              </tr>
+              <tr>
+                <td><code>(lti_consumer_id, context_id)</code></td>
+                <td>One course getting two rows.</td>
+              </tr>
+              <tr>
+                <td><code>(lti_consumer_id, nonce)</code></td>
+                <td>A replayed launch. The second insert fails.</td>
+              </tr>
+              <tr>
+                <td><code>(poll_id, lti_user_id)</code></td>
+                <td>Voting twice on one poll.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
-  </section>
+      <p style="margin-top:12px;">The model for <code>polls</code> calls the creator link
+        <code>creator</code> and maps it to <code>LtiUser</code>, so the column is
+        <code>creator_id</code> and not <code>lti_user_id</code>.</p>
 
-  <section id="next">
-    <h2>What the launch does now</h2>
-    <p>This diagram shows the launch handler. Solid outlines are built and have specs. Dashed outlines are planned. Read it top to bottom. A diamond is a yes-or-no check.</p>
-    <figure class="diagram">
-      <svg viewBox="0 0 1000 910" role="img" aria-label="Planned launch handler. A launch POST passes four checks: known consumer key, matching signature, fresh timestamp, unused nonce. Any failure returns 401. A pass finds or creates the user and course, then branches on instructor to a poll admin page or a vote page.">
-        <defs>
-          <marker id="d-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#94a3b8"/></marker>
-          <marker id="d-ar-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#16a34a"/></marker>
-          <marker id="d-ar-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#dc2626"/></marker>
-        </defs>
+      <h3>What each table is for</h3>
+      <div class="grid grid-3">
+        <div class="edge-card ec-blue">
+          <div class="ec-title">lti_consumers</div>
+          <div class="ec-desc">Key and secret. Read in the first check. The seed makes one row:
+            <code>key</code> / <code>secret</code>. Written by: the seed.</div>
+        </div>
+        <div class="edge-card ec-red">
+          <div class="ec-title">used_nonces</div>
+          <div class="ec-desc">One row per accepted nonce. A duplicate row means a replay. Written
+            by: <code>ReplayGuard</code>.</div>
+        </div>
+        <div class="edge-card ec-purple">
+          <div class="ec-title">lti_users</div>
+          <div class="ec-desc">One row per Canvas user. Holds the 1.1 <code>user_id</code> and a
+            spare column for the 1.3 <code>sub</code>. Written by: <code>LaunchRecords</code>.</div>
+        </div>
+        <div class="edge-card ec-teal">
+          <div class="ec-title">lti_contexts</div>
+          <div class="ec-desc">One row per course (<code>context_id</code>). Written by:
+            <code>LaunchRecords</code>.</div>
+        </div>
+        <div class="edge-card ec-orange">
+          <div class="ec-title">polls</div>
+          <div class="ec-desc">A question and its options, owned by a course and a creator. Options
+            live in a jsonb array.</div>
+        </div>
+        <div class="edge-card ec-green">
+          <div class="ec-title">votes</div>
+          <div class="ec-desc">One row per user per poll. A unique index enforces it.</div>
+        </div>
+      </div>
+      <p style="margin-top:12px;">Polls and votes point at <code>lti_users</code> by an internal id,
+        not at the raw LTI id string. In Stage 7 the same person arrives with a different id in 1.3.
+        The internal id keeps their votes attached.</p>
+    </section>
 
-        <rect class="bx" x="120" y="10" width="420" height="56" rx="10"/>
-        <text class="t-h" x="330" y="34" text-anchor="middle">Canvas POSTs the launch form</text>
-        <text class="t-s" x="330" y="53" text-anchor="middle">POST /lti/launch   (routes.rb:6)</text>
-        <line x1="330" y1="66" x2="330" y2="100" stroke="#94a3b8" stroke-width="2" marker-end="url(#d-ar)"/>
-
-        <rect x="100" y="84" width="490" height="598" rx="14" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="7 5"/>
-        <text class="t-l" x="114" y="79" fill="#2563eb">Built: verify, save, session</text>
-
-        <!-- D1 -->
-        <polygon points="330,100 500,145 330,190 160,145" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
-        <text class="t-h" x="330" y="141" text-anchor="middle">Is the consumer</text>
-        <text class="t-h" x="330" y="158" text-anchor="middle">key known?</text>
-        <line x1="500" y1="145" x2="608" y2="145" stroke="#dc2626" stroke-width="2" marker-end="url(#d-ar-r)"/>
-        <text class="t-l" x="554" y="137" text-anchor="middle" fill="#dc2626">no</text>
-        <rect x="610" y="120" width="340" height="50" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
-        <text class="t-h" x="780" y="142" text-anchor="middle">Reject: 401</text>
-        <text class="t-d" x="780" y="160" text-anchor="middle">no row in lti_consumers</text>
-        <line x1="330" y1="190" x2="330" y2="228" stroke="#94a3b8" stroke-width="2" marker-end="url(#d-ar)"/>
-        <text class="t-l" x="344" y="214" fill="#16a34a">yes</text>
-
-        <!-- D2 -->
-        <polygon points="330,228 500,273 330,318 160,273" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
-        <text class="t-h" x="330" y="269" text-anchor="middle">Does the signature</text>
-        <text class="t-h" x="330" y="286" text-anchor="middle">match?</text>
-        <line x1="500" y1="273" x2="608" y2="273" stroke="#dc2626" stroke-width="2" marker-end="url(#d-ar-r)"/>
-        <text class="t-l" x="554" y="265" text-anchor="middle" fill="#dc2626">no</text>
-        <rect x="610" y="248" width="340" height="50" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
-        <text class="t-h" x="780" y="270" text-anchor="middle">Reject: 401</text>
-        <text class="t-d" x="780" y="288" text-anchor="middle">forged or changed launch</text>
-        <line x1="330" y1="318" x2="330" y2="356" stroke="#94a3b8" stroke-width="2" marker-end="url(#d-ar)"/>
-        <text class="t-l" x="344" y="342" fill="#16a34a">yes</text>
-
-        <!-- D3 -->
-        <polygon points="330,356 500,401 330,446 160,401" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
-        <text class="t-h" x="330" y="397" text-anchor="middle">Is the timestamp</text>
-        <text class="t-h" x="330" y="414" text-anchor="middle">within 5 minutes?</text>
-        <line x1="500" y1="401" x2="608" y2="401" stroke="#dc2626" stroke-width="2" marker-end="url(#d-ar-r)"/>
-        <text class="t-l" x="554" y="393" text-anchor="middle" fill="#dc2626">no</text>
-        <rect x="610" y="376" width="340" height="50" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
-        <text class="t-h" x="780" y="398" text-anchor="middle">Reject: 401</text>
-        <text class="t-d" x="780" y="416" text-anchor="middle">old or future launch</text>
-        <line x1="330" y1="446" x2="330" y2="484" stroke="#94a3b8" stroke-width="2" marker-end="url(#d-ar)"/>
-        <text class="t-l" x="344" y="470" fill="#16a34a">yes</text>
-
-        <!-- D4 -->
-        <polygon points="330,484 500,529 330,574 160,529" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
-        <text class="t-h" x="330" y="525" text-anchor="middle">Is the nonce</text>
-        <text class="t-h" x="330" y="542" text-anchor="middle">unused?</text>
-        <line x1="500" y1="529" x2="608" y2="529" stroke="#dc2626" stroke-width="2" marker-end="url(#d-ar-r)"/>
-        <text class="t-l" x="554" y="521" text-anchor="middle" fill="#dc2626">no</text>
-        <rect x="610" y="504" width="340" height="50" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
-        <text class="t-h" x="780" y="526" text-anchor="middle">Reject: 401</text>
-        <text class="t-d" x="780" y="544" text-anchor="middle">replay (row in used_nonces)</text>
-        <line x1="330" y1="574" x2="330" y2="612" stroke="#94a3b8" stroke-width="2" marker-end="url(#d-ar)"/>
-        <text class="t-l" x="344" y="602" fill="#16a34a">yes</text>
-
-        <!-- find or create -->
-        <rect x="120" y="612" width="420" height="56" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5"/>
-        <text class="t-h" x="330" y="636" text-anchor="middle">Find or create the user and course</text>
-        <text class="t-s" x="330" y="655" text-anchor="middle">lti_users, lti_contexts</text>
-        <text class="t-l" x="604" y="646" fill="#16a34a">Built (LaunchRecords)</text>
-        <text class="t-l" x="344" y="694" fill="#16a34a">built: ids saved in the session</text>
-        <line x1="330" y1="668" x2="330" y2="706" stroke="#94a3b8" stroke-width="2" marker-end="url(#d-ar)"/>
-
-        <!-- D5 -->
-        <polygon points="330,706 500,751 330,796 160,751" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
-        <text class="t-h" x="330" y="747" text-anchor="middle">Is the user an</text>
-        <text class="t-h" x="330" y="764" text-anchor="middle">instructor?</text>
-        <line x1="500" y1="751" x2="608" y2="751" stroke="#16a34a" stroke-width="2" marker-end="url(#d-ar-g)"/>
-        <text class="t-l" x="554" y="743" text-anchor="middle" fill="#16a34a">yes</text>
-        <rect x="610" y="726" width="340" height="50" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="6 4"/>
-        <text class="t-h" x="780" y="748" text-anchor="middle">Poll admin page</text>
-        <text class="t-d" x="780" y="766" text-anchor="middle">create polls, see results</text>
-        <line x1="330" y1="796" x2="330" y2="834" stroke="#94a3b8" stroke-width="2" marker-end="url(#d-ar)"/>
-        <text class="t-l" x="344" y="820" fill="#64748b">no</text>
-        <rect x="120" y="834" width="420" height="56" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="6 4"/>
-        <text class="t-h" x="330" y="858" text-anchor="middle">Vote page</text>
-        <text class="t-d" x="330" y="877" text-anchor="middle">a student votes once per poll</text>
-      </svg>
-      <figcaption>A launch with a valid signature but no <code>user_id</code> or <code>context_id</code> gets 400 at the find-or-create step. The role check (<code>Lti1p1::Roles</code>) reads <code>roles</code> and <code>ext_roles</code>. Canvas sends them in two shapes, so see the role note in Gotchas.</figcaption>
-    </figure>
-
-    <h3 id="database">How the six tables relate</h3>
-    <p>Every table hangs off <code>lti_consumers</code>, because a <code>user_id</code> or <code>context_id</code> is only unique inside one Canvas installation. Polls and votes point at <code>lti_users</code> by internal id. Read each line from the <strong>1</strong> end (the parent) to the <strong>N</strong> end (the many children).</p>
-    <figure class="diagram">
-<svg viewBox="0 0 1000 850" role="img" aria-label="Entity relationship diagram. lti_consumers has many lti_users, lti_contexts, and used_nonces. lti_contexts has many polls. lti_users has many polls as creator and many votes. polls has many votes.">
-<path d="M365,93 H165 V250" fill="none" stroke="#94a3b8" stroke-width="2"/>
-<text class="t-l" x="350" y="86" fill="#475569">1</text>
-<text class="t-l" x="172" y="243" fill="#475569">N</text>
-<path d="M500,166 V250" fill="none" stroke="#94a3b8" stroke-width="2"/>
-<text class="t-l" x="508" y="184" fill="#475569">1</text>
-<text class="t-l" x="508" y="243" fill="#475569">N</text>
-<path d="M635,93 H835 V250" fill="none" stroke="#94a3b8" stroke-width="2"/>
-<text class="t-l" x="642" y="86" fill="#475569">1</text>
-<text class="t-l" x="842" y="243" fill="#475569">N</text>
-<path d="M835,396 V563 H635" fill="none" stroke="#94a3b8" stroke-width="2"/>
-<text class="t-l" x="842" y="414" fill="#475569">1</text>
-<text class="t-l" x="643" y="556" fill="#475569">N</text>
-<text class="t-s" x="845" y="480" fill="#64748b">lti_context_id</text>
-<path d="M215,396 V563 H365" fill="none" stroke="#94a3b8" stroke-width="2"/>
-<text class="t-l" x="222" y="414" fill="#475569">1</text>
-<text class="t-l" x="350" y="556" fill="#475569">N</text>
-<text class="t-s" x="225" y="500" fill="#64748b">creator_id</text>
-<path d="M500,636 V700" fill="none" stroke="#94a3b8" stroke-width="2"/>
-<text class="t-l" x="508" y="654" fill="#475569">1</text>
-<text class="t-l" x="508" y="693" fill="#475569">N</text>
-<text class="t-s" x="520" y="672" fill="#64748b">poll_id</text>
-<path d="M110,396 V762 H365" fill="none" stroke="#94a3b8" stroke-width="2"/>
-<text class="t-l" x="118" y="414" fill="#475569">1</text>
-<text class="t-l" x="350" y="755" fill="#475569">N</text>
-<text class="t-s" x="120" y="600" fill="#64748b">lti_user_id</text>
-<rect x="365" y="20" width="270" height="146" rx="10" fill="#ffffff"/>
-<path d="M365,50 V30 a10,10 0 0 1 10,-10 H625 a10,10 0 0 1 10,10 V50 z" fill="#eff6ff"/>
-<rect x="365" y="20" width="270" height="146" rx="10" fill="none" stroke="#2563eb" stroke-width="1.5"/>
-<line x1="365" y1="50" x2="635" y2="50" stroke="#2563eb" stroke-width="1"/>
-<text class="t-h" x="500.0" y="40" text-anchor="middle" style="font-family:var(--mono)">lti_consumers</text>
-<text class="t-l" x="375" y="66" style="font-size:10px" fill="#d97706">PK</text>
-<text class="t-s" x="401" y="66" style="fill:#1e293b">id</text>
-<text class="t-d" x="625" y="66" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-s" x="401" y="88" style="fill:#1e293b">name</text>
-<text class="t-d" x="625" y="88" text-anchor="end" style="font-size:10.5px;fill:#64748b">string</text>
-<text class="t-l" x="375" y="110" style="font-size:10px" fill="#16a34a">UQ</text>
-<text class="t-s" x="401" y="110" style="fill:#1e293b">consumer_key</text>
-<text class="t-d" x="625" y="110" text-anchor="end" style="font-size:10.5px;fill:#64748b">string</text>
-<text class="t-s" x="401" y="132" style="fill:#1e293b">shared_secret</text>
-<text class="t-d" x="625" y="132" text-anchor="end" style="font-size:10.5px;fill:#64748b">string</text>
-<text class="t-s" x="401" y="154" style="fill:#1e293b">instance_guid</text>
-<text class="t-d" x="625" y="154" text-anchor="end" style="font-size:10.5px;fill:#64748b">string, null ok</text>
-<rect x="30" y="250" width="270" height="146" rx="10" fill="#ffffff"/>
-<path d="M30,280 V260 a10,10 0 0 1 10,-10 H290 a10,10 0 0 1 10,10 V280 z" fill="#f5f3ff"/>
-<rect x="30" y="250" width="270" height="146" rx="10" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
-<line x1="30" y1="280" x2="300" y2="280" stroke="#7c3aed" stroke-width="1"/>
-<text class="t-h" x="165.0" y="270" text-anchor="middle" style="font-family:var(--mono)">lti_users</text>
-<text class="t-l" x="40" y="296" style="font-size:10px" fill="#d97706">PK</text>
-<text class="t-s" x="66" y="296" style="fill:#1e293b">id</text>
-<text class="t-d" x="290" y="296" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-l" x="40" y="318" style="font-size:10px" fill="#7c3aed">FK</text>
-<text class="t-s" x="66" y="318" style="fill:#1e293b">lti_consumer_id</text>
-<text class="t-d" x="290" y="318" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-s" x="66" y="340" style="fill:#1e293b">lti1p1_user_id</text>
-<text class="t-d" x="290" y="340" text-anchor="end" style="font-size:10.5px;fill:#64748b">string</text>
-<text class="t-s" x="66" y="362" style="fill:#1e293b">lti1p3_sub</text>
-<text class="t-d" x="290" y="362" text-anchor="end" style="font-size:10.5px;fill:#64748b">string, null ok</text>
-<text class="t-s" x="66" y="384" style="fill:#1e293b">name</text>
-<text class="t-d" x="290" y="384" text-anchor="end" style="font-size:10.5px;fill:#64748b">string, null ok</text>
-<rect x="365" y="250" width="270" height="124" rx="10" fill="#ffffff"/>
-<path d="M365,280 V260 a10,10 0 0 1 10,-10 H625 a10,10 0 0 1 10,10 V280 z" fill="#fef2f2"/>
-<rect x="365" y="250" width="270" height="124" rx="10" fill="none" stroke="#dc2626" stroke-width="1.5"/>
-<line x1="365" y1="280" x2="635" y2="280" stroke="#dc2626" stroke-width="1"/>
-<text class="t-h" x="500.0" y="270" text-anchor="middle" style="font-family:var(--mono)">used_nonces</text>
-<text class="t-l" x="375" y="296" style="font-size:10px" fill="#d97706">PK</text>
-<text class="t-s" x="401" y="296" style="fill:#1e293b">id</text>
-<text class="t-d" x="625" y="296" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-l" x="375" y="318" style="font-size:10px" fill="#7c3aed">FK</text>
-<text class="t-s" x="401" y="318" style="fill:#1e293b">lti_consumer_id</text>
-<text class="t-d" x="625" y="318" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-s" x="401" y="340" style="fill:#1e293b">nonce</text>
-<text class="t-d" x="625" y="340" text-anchor="end" style="font-size:10.5px;fill:#64748b">string</text>
-<text class="t-s" x="401" y="362" style="fill:#1e293b">oauth_timestamp</text>
-<text class="t-d" x="625" y="362" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<rect x="700" y="250" width="270" height="146" rx="10" fill="#ffffff"/>
-<path d="M700,280 V260 a10,10 0 0 1 10,-10 H960 a10,10 0 0 1 10,10 V280 z" fill="#f0fdfa"/>
-<rect x="700" y="250" width="270" height="146" rx="10" fill="none" stroke="#0d9488" stroke-width="1.5"/>
-<line x1="700" y1="280" x2="970" y2="280" stroke="#0d9488" stroke-width="1"/>
-<text class="t-h" x="835.0" y="270" text-anchor="middle" style="font-family:var(--mono)">lti_contexts</text>
-<text class="t-l" x="710" y="296" style="font-size:10px" fill="#d97706">PK</text>
-<text class="t-s" x="736" y="296" style="fill:#1e293b">id</text>
-<text class="t-d" x="960" y="296" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-l" x="710" y="318" style="font-size:10px" fill="#7c3aed">FK</text>
-<text class="t-s" x="736" y="318" style="fill:#1e293b">lti_consumer_id</text>
-<text class="t-d" x="960" y="318" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-s" x="736" y="340" style="fill:#1e293b">context_id</text>
-<text class="t-d" x="960" y="340" text-anchor="end" style="font-size:10.5px;fill:#64748b">string</text>
-<text class="t-s" x="736" y="362" style="fill:#1e293b">title</text>
-<text class="t-d" x="960" y="362" text-anchor="end" style="font-size:10.5px;fill:#64748b">string, null ok</text>
-<text class="t-s" x="736" y="384" style="fill:#1e293b">label</text>
-<text class="t-d" x="960" y="384" text-anchor="end" style="font-size:10.5px;fill:#64748b">string, null ok</text>
-<rect x="365" y="490" width="270" height="146" rx="10" fill="#ffffff"/>
-<path d="M365,520 V500 a10,10 0 0 1 10,-10 H625 a10,10 0 0 1 10,10 V520 z" fill="#fffbeb"/>
-<rect x="365" y="490" width="270" height="146" rx="10" fill="none" stroke="#d97706" stroke-width="1.5"/>
-<line x1="365" y1="520" x2="635" y2="520" stroke="#d97706" stroke-width="1"/>
-<text class="t-h" x="500.0" y="510" text-anchor="middle" style="font-family:var(--mono)">polls</text>
-<text class="t-l" x="375" y="536" style="font-size:10px" fill="#d97706">PK</text>
-<text class="t-s" x="401" y="536" style="fill:#1e293b">id</text>
-<text class="t-d" x="625" y="536" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-l" x="375" y="558" style="font-size:10px" fill="#7c3aed">FK</text>
-<text class="t-s" x="401" y="558" style="fill:#1e293b">lti_context_id</text>
-<text class="t-d" x="625" y="558" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-l" x="375" y="580" style="font-size:10px" fill="#7c3aed">FK</text>
-<text class="t-s" x="401" y="580" style="fill:#1e293b">creator_id</text>
-<text class="t-d" x="625" y="580" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-s" x="401" y="602" style="fill:#1e293b">question</text>
-<text class="t-d" x="625" y="602" text-anchor="end" style="font-size:10.5px;fill:#64748b">text</text>
-<text class="t-s" x="401" y="624" style="fill:#1e293b">options</text>
-<text class="t-d" x="625" y="624" text-anchor="end" style="font-size:10.5px;fill:#64748b">jsonb</text>
-<rect x="365" y="700" width="270" height="124" rx="10" fill="#ffffff"/>
-<path d="M365,730 V710 a10,10 0 0 1 10,-10 H625 a10,10 0 0 1 10,10 V730 z" fill="#f0fdf4"/>
-<rect x="365" y="700" width="270" height="124" rx="10" fill="none" stroke="#16a34a" stroke-width="1.5"/>
-<line x1="365" y1="730" x2="635" y2="730" stroke="#16a34a" stroke-width="1"/>
-<text class="t-h" x="500.0" y="720" text-anchor="middle" style="font-family:var(--mono)">votes</text>
-<text class="t-l" x="375" y="746" style="font-size:10px" fill="#d97706">PK</text>
-<text class="t-s" x="401" y="746" style="fill:#1e293b">id</text>
-<text class="t-d" x="625" y="746" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-l" x="375" y="768" style="font-size:10px" fill="#7c3aed">FK</text>
-<text class="t-s" x="401" y="768" style="fill:#1e293b">poll_id</text>
-<text class="t-d" x="625" y="768" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-l" x="375" y="790" style="font-size:10px" fill="#7c3aed">FK</text>
-<text class="t-s" x="401" y="790" style="fill:#1e293b">lti_user_id</text>
-<text class="t-d" x="625" y="790" text-anchor="end" style="font-size:10.5px;fill:#64748b">bigint</text>
-<text class="t-s" x="401" y="812" style="fill:#1e293b">option_index</text>
-<text class="t-d" x="625" y="812" text-anchor="end" style="font-size:10.5px;fill:#64748b">integer</text>
-</svg>
-      <figcaption><span style="color:#d97706;font-weight:700">PK</span> primary key. <span style="color:#7c3aed;font-weight:700">FK</span> foreign key. <span style="color:#16a34a;font-weight:700">UQ</span> unique on its own. Every table also has <code>created_at</code> and <code>updated_at</code>, which the diagram leaves out. A launch is not saved. The session keeps three things: the user id, the course id, and the can-create-polls answer.</figcaption>
-    </figure>
-
-    <div class="grid" style="grid-template-columns:1fr;">
+    <section id="versions">
+      <h2>LTI 1.1 versus 1.3</h2>
+      <p>This app is the left column. The right column is the separate QuickPoll 1.3 app. <a
+          href="lti-1p1-vs-1p3.html">The full comparison, with pictures, is in its own page.</a></p>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Child table</th><th>Column</th><th>Points at</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Question</th>
+              <th>LTI 1.1 (this app)</th>
+              <th>LTI 1.3</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr><td><code>lti_users</code></td><td><code>lti_consumer_id</code></td><td><code>lti_consumers</code></td></tr>
-            <tr><td><code>lti_contexts</code></td><td><code>lti_consumer_id</code></td><td><code>lti_consumers</code></td></tr>
-            <tr><td><code>used_nonces</code></td><td><code>lti_consumer_id</code></td><td><code>lti_consumers</code></td></tr>
-            <tr><td><code>polls</code></td><td><code>lti_context_id</code></td><td><code>lti_contexts</code></td></tr>
-            <tr><td><code>polls</code></td><td><code>creator_id</code></td><td><code>lti_users</code></td></tr>
-            <tr><td><code>votes</code></td><td><code>poll_id</code></td><td><code>polls</code></td></tr>
-            <tr><td><code>votes</code></td><td><code>lti_user_id</code></td><td><code>lti_users</code></td></tr>
+            <tr>
+              <td>How does the tool trust the launch?</td>
+              <td>Shared secret. HMAC-SHA1 signature over the form.</td>
+              <td>Canvas signs a JWT with a private key. The tool checks it with Canvas's public
+                keys (JWKS).</td>
+            </tr>
+            <tr>
+              <td>What is a launch?</td>
+              <td>One form POST.</td>
+              <td>Three steps: login initiation, a redirect to Canvas, then a POST of
+                <code>id_token</code>.</td>
+            </tr>
+            <tr>
+              <td>Where is the user data?</td>
+              <td>Flat form fields.</td>
+              <td>Claims inside the JWT.</td>
+            </tr>
+            <tr>
+              <td>What stops a replay?</td>
+              <td><code>oauth_timestamp</code> and <code>oauth_nonce</code>.</td>
+              <td><code>nonce</code>, <code>state</code>, and <code>exp</code>.</td>
+            </tr>
+            <tr>
+              <td>How do you install it?</td>
+              <td>Paste XML, key, and secret.</td>
+              <td>JSON configuration and a developer key.</td>
+            </tr>
+            <tr>
+              <td>How do grades go back?</td>
+              <td>A signed XML POST (Basic Outcomes).</td>
+              <td>A REST API (AGS) with an OAuth2 token.</td>
+            </tr>
+            <tr>
+              <td>Who holds the secret?</td>
+              <td>Both sides hold the same one.</td>
+              <td>The tool holds a private key. Canvas holds only the public half.</td>
+            </tr>
           </tbody>
         </table>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Unique rule</th><th>What it stops</th></tr></thead>
-          <tbody>
-            <tr><td><code>consumer_key</code></td><td>Two installations sharing a key.</td></tr>
-            <tr><td><code>(lti_consumer_id, lti1p1_user_id)</code></td><td>One person getting two rows.</td></tr>
-            <tr><td><code>(lti_consumer_id, lti1p3_sub)</code>, only when set</td><td>Two rows claiming the same 1.3 identity. The 1.3 app uses it with the platform in place of the consumer.</td></tr>
-            <tr><td><code>(lti_consumer_id, context_id)</code></td><td>One course getting two rows.</td></tr>
-            <tr><td><code>(lti_consumer_id, nonce)</code></td><td>A replayed launch. The second insert fails.</td></tr>
-            <tr><td><code>(poll_id, lti_user_id)</code></td><td>Voting twice on one poll.</td></tr>
-          </tbody>
-        </table>
+    </section>
+
+    <section id="vocab">
+      <h2>Vocabulary</h2>
+      <div class="grid grid-3">
+        <div class="edge-card ec-blue">
+          <div class="ec-title">oauth_consumer_key</div>
+          <div class="ec-desc">A public name for the Canvas side of the connection. Yours is
+            <code>key</code>. It selects the secret.</div>
+        </div>
+        <div class="edge-card ec-purple">
+          <div class="ec-title">shared secret</div>
+          <div class="ec-desc">The private text both sides know. Yours is <code>secret</code>. Never
+            sent in a request.</div>
+        </div>
+        <div class="edge-card ec-teal">
+          <div class="ec-title">oauth_nonce</div>
+          <div class="ec-desc">A random string, new on every launch. Your app records it so a copy
+            of the launch cannot run twice.</div>
+        </div>
+        <div class="edge-card ec-orange">
+          <div class="ec-title">oauth_timestamp</div>
+          <div class="ec-desc">Seconds since 1970 when Canvas signed the form. Old timestamps are
+            rejected.</div>
+        </div>
+        <div class="edge-card ec-green">
+          <div class="ec-title">context_id</div>
+          <div class="ec-desc">The course. The same on every launch from that course.</div>
+        </div>
+        <div class="edge-card ec-red">
+          <div class="ec-title">resource_link_id</div>
+          <div class="ec-desc">One placement of the tool. In course navigation it equals
+            <code>context_id</code>. On an assignment it differs.</div>
+        </div>
+        <div class="edge-card ec-blue">
+          <div class="ec-title">user_id</div>
+          <div class="ec-desc">An opaque 40-character id for the person. Use this one.
+            <code>custom_canvas_user_id</code> is Canvas's database number.</div>
+        </div>
+        <div class="edge-card ec-purple">
+          <div class="ec-title">placement</div>
+          <div class="ec-desc">Where in Canvas the link lives. Yours:
+            <code>course_navigation</code>.</div>
+        </div>
+        <div class="edge-card ec-teal">
+          <div class="ec-title">tool_consumer_instance_guid</div>
+          <div class="ec-desc">Which Canvas installation sent the launch. A <code>user_id</code> is
+            only unique inside one guid.</div>
+        </div>
+        <div class="edge-card ec-orange">
+          <div class="ec-title">replay</div>
+          <div class="ec-desc">Sending a copied launch again. The signature stays valid, so the
+            timestamp and nonce checks stop it.</div>
+        </div>
+        <div class="edge-card ec-green">
+          <div class="ec-title">session</div>
+          <div class="ec-desc">A cookie the browser sends back on every request. It lets the tool
+            remember who launched. A verified launch starts one and stores the user id and the
+            course id.</div>
+        </div>
+        <div class="edge-card ec-blue">
+          <div class="ec-title">roles / ext_roles</div>
+          <div class="ec-desc">Two launch fields that say what the person is in the course. Short
+            names like <code>Instructor</code>, or URNs like
+            <code>urn:lti:role:ims/lis/Instructor</code>. Read both.</div>
+        </div>
+        <div class="edge-card ec-orange">
+          <div class="ec-title">303 See Other</div>
+          <div class="ec-desc">A redirect after a POST. It tells the browser to load the next page
+            with a GET. The launch and the poll form both use it.</div>
+        </div>
+        <div class="edge-card ec-red">
+          <div class="ec-title">session fixation</div>
+          <div class="ec-desc">An attacker plants a session cookie, then waits for the victim to
+            sign in. A fresh session on every launch (<code>reset_session</code>) stops it.</div>
+        </div>
       </div>
-    </div>
-    <p style="margin-top:12px;">The model for <code>polls</code> calls the creator link <code>creator</code> and maps it to <code>LtiUser</code>, so the column is <code>creator_id</code> and not <code>lti_user_id</code>.</p>
+    </section>
 
-    <h3>What each table is for</h3>
-    <div class="grid grid-3">
-      <div class="edge-card ec-blue"><div class="ec-title">lti_consumers</div><div class="ec-desc">Key and secret. Read in the first check. The seed makes one row: <code>key</code> / <code>secret</code>. Written by: the seed.</div></div>
-      <div class="edge-card ec-red"><div class="ec-title">used_nonces</div><div class="ec-desc">One row per accepted nonce. A duplicate row means a replay. Written by: <code>ReplayGuard</code>.</div></div>
-      <div class="edge-card ec-purple"><div class="ec-title">lti_users</div><div class="ec-desc">One row per Canvas user. Holds the 1.1 <code>user_id</code> and a spare column for the 1.3 <code>sub</code>. Written by: <code>LaunchRecords</code>.</div></div>
-      <div class="edge-card ec-teal"><div class="ec-title">lti_contexts</div><div class="ec-desc">One row per course (<code>context_id</code>). Written by: <code>LaunchRecords</code>.</div></div>
-      <div class="edge-card ec-orange"><div class="ec-title">polls</div><div class="ec-desc">A question and its options, owned by a course and a creator. Options live in a jsonb array.</div></div>
-      <div class="edge-card ec-green"><div class="ec-title">votes</div><div class="ec-desc">One row per user per poll. A unique index enforces it.</div></div>
-    </div>
-    <p style="margin-top:12px;">Polls and votes point at <code>lti_users</code> by an internal id, not at the raw LTI id string. In Stage 7 the same person arrives with a different id in 1.3. The internal id keeps their votes attached.</p>
-  </section>
+    <section id="gotchas">
+      <h2>Gotchas we already hit</h2>
+      <div class="grid grid-2">
+        <div class="callout callout-warn"><strong>A param can arrive twice.</strong> With "OAuth
+          Compliant" off, Canvas leaves <code>?placement=...</code> on the URL and also copies it
+          into the body. It signs the value once. A literal reading of RFC 5849 counts it twice and
+          fails. One spec covers this. Fix it by treating identical name and value pairs as one.
+        </div>
+        <div class="callout callout-warn"><strong>Roles come in two shapes.</strong> A teacher sends
+          <code>Instructor</code>. An admin who is not enrolled sends URNs like
+          <code>urn:lti:instrole:ims/lis/Administrator</code>, and only <code>ext_roles</code> lists
+          Instructor. Read the text after the last <code>/</code> in each entry. A real TA sends
+          <code>TeachingAssistant</code> in <code>roles</code> and also <code>Instructor</code> in
+          <code>ext_roles</code>, so a TA counts as an instructor. The poll pages ask
+          <code>can_create_polls?</code>.</div>
+        <div class="callout callout-warn"><strong>Forgery protection: off for the launch, on for the
+            poll form.</strong> <code>BaseController</code> skips it, because Canvas posts the
+          launch from another origin and the signature is the proof. The poll form is a normal form
+          from this app, so <code>PollsController</code> turns it back on with
+          <code>protect_from_forgery with: :exception</code>. Rails' test setup disables it, so one
+          spec switches it on. A live check showed the token works inside the Canvas iframe.</div>
+        <div class="callout callout-warn"><strong>Find a record through the session's
+            course.</strong> <code>current_lti_context.polls.find(id)</code> answers 404 for a poll
+          in another course. <code>Poll.find(id)</code> would let a person vote in any course by
+          guessing an id. A spec checks this.</div>
+        <div class="callout callout-warn"><strong>Views cannot call private controller
+            methods.</strong> <code>can_create_polls?</code>, <code>current_lti_user</code>, and
+          <code>current_lti_context</code> are private in <code>BaseController</code>. A line
+          <code>helper_method ...</code> makes them callable from a view.</div>
+        <div class="callout callout-warn"><strong>The test environment.</strong> The container sets
+          <code>RAILS_ENV=development</code>. <code>spec/rails_helper.rb</code> now forces
+          <code>test</code>, so plain <code>rspec</code> in the container uses the test database.
+          Without that, rspec hit the dev database and its seeded consumer.</div>
+        <div class="callout callout-warn"><strong><code>to_query</code> encodes a space as
+            <code>+</code>.</strong> OAuth needs <code>%20</code>. Encode each name and value with
+          the same function you use for the URL. This one bug failed every captured launch, because
+          they contain spaces.</div>
+        <div class="callout callout-warn"><strong>Use <code>request.request_parameters</code>, not
+            <code>params</code>.</strong> <code>params</code> adds <code>controller</code>,
+          <code>action</code>, and the query keys. Canvas never signed those, so the signature
+          fails.</div>
+        <div class="callout callout-warn"><strong>A failed <code>before_action</code> skips every
+            <code>after_action</code>.</strong> The 401 pages kept <code>X-Frame-Options</code>, and
+          Canvas would not show them. Removing the header in a <code>before_action</code> fixes it.
+        </div>
+        <div class="callout callout-warn"><strong>Session cookies in an iframe.</strong> Locally it
+          works, because Canvas and the tool share the <code>inseng.test</code> domain. In
+          production they are different sites, and browsers block third-party cookies. Safari blocks
+          them now. It needs <code>same_site: :none</code> and <code>secure: true</code>, and still
+          may fail. The 1.3 app has the same problem. It keeps the login state in Postgres, not in a
+          cookie, but it still uses a session cookie after the launch.</div>
+        <div class="callout callout-warn"><strong>The <code>json</code> gem.</strong> Version 3.x
+          breaks Rails 8.0.5.2 with <code>unknown keyword: quirks_mode</code>. The
+          <code>Gemfile</code> pins <code>json &lt; 3</code>. Remove the pin after a Rails upgrade
+          that fixes it.</div>
+        <div class="callout callout-info"><strong>Iframe header.</strong> Rails sends
+          <code>X-Frame-Options: SAMEORIGIN</code> by default. The browser would refuse to show the
+          page inside Canvas. <code>BaseController</code> removes it.</div>
+        <div class="callout callout-info"><strong>Real data.</strong> A launch holds names, emails,
+          and user ids. That is student data under FERPA. Use fake users in a test course, and keep
+          real launches out of shared docs and fixtures.</div>
+      </div>
+    </section>
 
-  <section id="versions">
-    <h2>LTI 1.1 versus 1.3</h2>
-    <p>This app is the left column. The right column is the separate QuickPoll 1.3 app. <a href="lti-1p1-vs-1p3.html">The full comparison, with pictures, is in its own page.</a></p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Question</th><th>LTI 1.1 (this app)</th><th>LTI 1.3</th></tr></thead>
-        <tbody>
-          <tr><td>How does the tool trust the launch?</td><td>Shared secret. HMAC-SHA1 signature over the form.</td><td>Canvas signs a JWT with a private key. The tool checks it with Canvas's public keys (JWKS).</td></tr>
-          <tr><td>What is a launch?</td><td>One form POST.</td><td>Three steps: login initiation, a redirect to Canvas, then a POST of <code>id_token</code>.</td></tr>
-          <tr><td>Where is the user data?</td><td>Flat form fields.</td><td>Claims inside the JWT.</td></tr>
-          <tr><td>What stops a replay?</td><td><code>oauth_timestamp</code> and <code>oauth_nonce</code>.</td><td><code>nonce</code>, <code>state</code>, and <code>exp</code>.</td></tr>
-          <tr><td>How do you install it?</td><td>Paste XML, key, and secret.</td><td>JSON configuration and a developer key.</td></tr>
-          <tr><td>How do grades go back?</td><td>A signed XML POST (Basic Outcomes).</td><td>A REST API (AGS) with an OAuth2 token.</td></tr>
-          <tr><td>Who holds the secret?</td><td>Both sides hold the same one.</td><td>The tool holds a private key. Canvas holds only the public half.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section id="vocab">
-    <h2>Vocabulary</h2>
-    <div class="grid grid-3">
-      <div class="edge-card ec-blue"><div class="ec-title">oauth_consumer_key</div><div class="ec-desc">A public name for the Canvas side of the connection. Yours is <code>key</code>. It selects the secret.</div></div>
-      <div class="edge-card ec-purple"><div class="ec-title">shared secret</div><div class="ec-desc">The private text both sides know. Yours is <code>secret</code>. Never sent in a request.</div></div>
-      <div class="edge-card ec-teal"><div class="ec-title">oauth_nonce</div><div class="ec-desc">A random string, new on every launch. Your app records it so a copy of the launch cannot run twice.</div></div>
-      <div class="edge-card ec-orange"><div class="ec-title">oauth_timestamp</div><div class="ec-desc">Seconds since 1970 when Canvas signed the form. Old timestamps are rejected.</div></div>
-      <div class="edge-card ec-green"><div class="ec-title">context_id</div><div class="ec-desc">The course. The same on every launch from that course.</div></div>
-      <div class="edge-card ec-red"><div class="ec-title">resource_link_id</div><div class="ec-desc">One placement of the tool. In course navigation it equals <code>context_id</code>. On an assignment it differs.</div></div>
-      <div class="edge-card ec-blue"><div class="ec-title">user_id</div><div class="ec-desc">An opaque 40-character id for the person. Use this one. <code>custom_canvas_user_id</code> is Canvas's database number.</div></div>
-      <div class="edge-card ec-purple"><div class="ec-title">placement</div><div class="ec-desc">Where in Canvas the link lives. Yours: <code>course_navigation</code>.</div></div>
-      <div class="edge-card ec-teal"><div class="ec-title">tool_consumer_instance_guid</div><div class="ec-desc">Which Canvas installation sent the launch. A <code>user_id</code> is only unique inside one guid.</div></div>
-      <div class="edge-card ec-orange"><div class="ec-title">replay</div><div class="ec-desc">Sending a copied launch again. The signature stays valid, so the timestamp and nonce checks stop it.</div></div>
-      <div class="edge-card ec-green"><div class="ec-title">session</div><div class="ec-desc">A cookie the browser sends back on every request. It lets the tool remember who launched. A verified launch starts one and stores the user id and the course id.</div></div>
-      <div class="edge-card ec-blue"><div class="ec-title">roles / ext_roles</div><div class="ec-desc">Two launch fields that say what the person is in the course. Short names like <code>Instructor</code>, or URNs like <code>urn:lti:role:ims/lis/Instructor</code>. Read both.</div></div>
-      <div class="edge-card ec-orange"><div class="ec-title">303 See Other</div><div class="ec-desc">A redirect after a POST. It tells the browser to load the next page with a GET. The launch and the poll form both use it.</div></div>
-      <div class="edge-card ec-red"><div class="ec-title">session fixation</div><div class="ec-desc">An attacker plants a session cookie, then waits for the victim to sign in. A fresh session on every launch (<code>reset_session</code>) stops it.</div></div>
-    </div>
-  </section>
-
-  <section id="gotchas">
-    <h2>Gotchas we already hit</h2>
-    <div class="grid grid-2">
-      <div class="callout callout-warn"><strong>A param can arrive twice.</strong> With "OAuth Compliant" off, Canvas leaves <code>?placement=...</code> on the URL and also copies it into the body. It signs the value once. A literal reading of RFC 5849 counts it twice and fails. One spec covers this. Fix it by treating identical name and value pairs as one.</div>
-      <div class="callout callout-warn"><strong>Roles come in two shapes.</strong> A teacher sends <code>Instructor</code>. An admin who is not enrolled sends URNs like <code>urn:lti:instrole:ims/lis/Administrator</code>, and only <code>ext_roles</code> lists Instructor. Read the text after the last <code>/</code> in each entry. A real TA sends <code>TeachingAssistant</code> in <code>roles</code> and also <code>Instructor</code> in <code>ext_roles</code>, so a TA counts as an instructor. The poll pages ask <code>can_create_polls?</code>.</div>
-      <div class="callout callout-warn"><strong>Forgery protection: off for the launch, on for the poll form.</strong> <code>BaseController</code> skips it, because Canvas posts the launch from another origin and the signature is the proof. The poll form is a normal form from this app, so <code>PollsController</code> turns it back on with <code>protect_from_forgery with: :exception</code>. Rails' test setup disables it, so one spec switches it on. A live check showed the token works inside the Canvas iframe.</div>
-      <div class="callout callout-warn"><strong>Find a record through the session's course.</strong> <code>current_lti_context.polls.find(id)</code> answers 404 for a poll in another course. <code>Poll.find(id)</code> would let a person vote in any course by guessing an id. A spec checks this.</div>
-      <div class="callout callout-warn"><strong>Views cannot call private controller methods.</strong> <code>can_create_polls?</code>, <code>current_lti_user</code>, and <code>current_lti_context</code> are private in <code>BaseController</code>. A line <code>helper_method ...</code> makes them callable from a view.</div>
-      <div class="callout callout-warn"><strong>The test environment.</strong> The container sets <code>RAILS_ENV=development</code>. <code>spec/rails_helper.rb</code> now forces <code>test</code>, so plain <code>rspec</code> in the container uses the test database. Without that, rspec hit the dev database and its seeded consumer.</div>
-      <div class="callout callout-warn"><strong><code>to_query</code> encodes a space as <code>+</code>.</strong> OAuth needs <code>%20</code>. Encode each name and value with the same function you use for the URL. This one bug failed every captured launch, because they contain spaces.</div>
-      <div class="callout callout-warn"><strong>Use <code>request.request_parameters</code>, not <code>params</code>.</strong> <code>params</code> adds <code>controller</code>, <code>action</code>, and the query keys. Canvas never signed those, so the signature fails.</div>
-      <div class="callout callout-warn"><strong>A failed <code>before_action</code> skips every <code>after_action</code>.</strong> The 401 pages kept <code>X-Frame-Options</code>, and Canvas would not show them. Removing the header in a <code>before_action</code> fixes it.</div>
-      <div class="callout callout-warn"><strong>Session cookies in an iframe.</strong> Locally it works, because Canvas and the tool share the <code>inseng.test</code> domain. In production they are different sites, and browsers block third-party cookies. Safari blocks them now. It needs <code>same_site: :none</code> and <code>secure: true</code>, and still may fail. The 1.3 app has the same problem. It keeps the login state in Postgres, not in a cookie, but it still uses a session cookie after the launch.</div>
-      <div class="callout callout-warn"><strong>The <code>json</code> gem.</strong> Version 3.x breaks Rails 8.0.5.2 with <code>unknown keyword: quirks_mode</code>. The <code>Gemfile</code> pins <code>json &lt; 3</code>. Remove the pin after a Rails upgrade that fixes it.</div>
-      <div class="callout callout-info"><strong>Iframe header.</strong> Rails sends <code>X-Frame-Options: SAMEORIGIN</code> by default. The browser would refuse to show the page inside Canvas. <code>BaseController</code> removes it.</div>
-      <div class="callout callout-info"><strong>Real data.</strong> A launch holds names, emails, and user ids. That is student data under FERPA. Use fake users in a test course, and keep real launches out of shared docs and fixtures.</div>
-    </div>
-  </section>
-
-  <section id="run">
-    <h2>Run it</h2>
-    <pre><code><span class="t-com"># from quickpoll_1p1/</span>
+    <section id="run">
+      <h2>Run it</h2>
+      <pre><code><span class="t-com"># from quickpoll_1p1/</span>
 docker compose up -d                                   <span class="t-com"># start Postgres and the app</span>
 docker compose logs -f web                             <span class="t-com"># watch launches arrive</span>
 docker compose run --rm web rspec                     <span class="t-com"># all specs (or run rspec inside webbashc)</span>
 docker compose run --rm web bin/rails db:seed          <span class="t-com"># make the key/secret consumer</span>
 curl http://quickpoll-1p1.inseng.test/lti/config       <span class="t-com"># the XML you paste into Canvas</span>
 docker compose exec web rails runner zscratchpads/replay_demo.rb   <span class="t-com"># sends one fake launch twice: 200, then 401</span></code></pre>
-    <div class="callout callout-ok"><strong>Next action.</strong> Click the link in Canvas. Then open <code>http://quickpoll-1p1.inseng.test/lti/me</code> in a new tab. It says who you are and which course, because the browser sent the session cookie back. Open it in a private window and it says "Launch required." It takes about two minutes.</div>
-  </section>
+      <div class="callout callout-ok"><strong>Next action.</strong> Click the link in Canvas. Then
+        open <code>http://quickpoll-1p1.inseng.test/lti/me</code> in a new tab. It says who you are
+        and which course, because the browser sent the session cookie back. Open it in a private
+        window and it says "Launch required." It takes about two minutes.</div>
+    </section>
 
-</main>
+  </main>
 </body>
+
 </html>

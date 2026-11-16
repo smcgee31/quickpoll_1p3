@@ -805,23 +805,128 @@
     }
 
     /* Beat 2: real screenshots that step through */
-  .demo { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 22px; align-items: center; }
-  @media (max-width: 860px) { .demo { grid-template-columns: 1fr; } }
-  .demo-steps { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .dstep { width: 100%; display: flex; gap: 12px; align-items: flex-start; text-align: left; font: inherit; color: var(--ink-body); background: var(--surface); border: 2px solid var(--rule); border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: border-color 0.3s, background 0.3s, box-shadow 0.3s; }
-  .dstep b { display: block; font-size: 1.02rem; color: var(--ink); }
-  .dstep small { display: block; font-size: 0.82rem; color: var(--ink-soft); line-height: 1.4; margin-top: 2px; }
-  .dstep .dn { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--rule-soft); color: var(--ink-soft); font-weight: 800; display: flex; align-items: center; justify-content: center; transition: background 0.3s, color 0.3s; }
-  .dstep.on { border-color: var(--blue); background: var(--blue-tint); box-shadow: var(--shadow-sm); }
-  .dstep.on .dn { background: var(--blue); color: #fff; }
-  .dstep:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
-  .stage { display: grid; border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: var(--shadow); cursor: pointer; }
-  .stage img { grid-area: 1 / 1; width: 100%; height: auto; display: block; opacity: 0; transition: opacity 0.6s ease; }
-  .stage img.on { opacity: 1; }
-  @media (prefers-reduced-motion: reduce) { .stage img { transition: none; } }
-  @media print { .stage img { opacity: 1; grid-area: auto; margin-bottom: 8px; } .stage { display: block; } }
+    .demo {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 22px;
+      align-items: center;
+    }
 
-  /* Closing slide */
+    @media (max-width: 860px) {
+      .demo {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .demo-steps {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .dstep {
+      width: 100%;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      text-align: left;
+      font: inherit;
+      color: var(--ink-body);
+      background: var(--surface);
+      border: 2px solid var(--rule);
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+    }
+
+    .dstep b {
+      display: block;
+      font-size: 1.02rem;
+      color: var(--ink);
+    }
+
+    .dstep small {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    .dstep .dn {
+      flex: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--rule-soft);
+      color: var(--ink-soft);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .dstep.on {
+      border-color: var(--blue);
+      background: var(--blue-tint);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .dstep.on .dn {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .dstep:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 2px;
+    }
+
+    .stage {
+      display: grid;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+
+    .stage img {
+      grid-area: 1 / 1;
+      width: 100%;
+      height: auto;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    .stage img.on {
+      opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stage img {
+        transition: none;
+      }
+    }
+
+    @media print {
+      .stage img {
+        opacity: 1;
+        grid-area: auto;
+        margin-bottom: 8px;
+      }
+
+      .stage {
+        display: block;
+      }
+    }
+
+    /* Closing slide */
     .closing .endcard {
       display: inline-block;
       background: rgba(255, 255, 255, 0.14);
@@ -832,9 +937,18 @@
       text-align: left;
     }
 
-    .closing .sub { max-width: none; white-space: nowrap; }
-  @media (max-width: 760px) { .closing .sub { white-space: normal; } }
-  .closing .endlabel {
+    .closing .sub {
+      max-width: none;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 760px) {
+      .closing .sub {
+        white-space: normal;
+      }
+    }
+
+    .closing .endlabel {
       font-size: 0.72rem;
       font-weight: 800;
       text-transform: uppercase;
@@ -1074,23 +1188,35 @@
   <section class="beat" id="b2" data-start="3" data-sec="8">
     <div class="inner">
       <h2>QuickPoll: a poll inside Canvas</h2>
-      <p class="lede">Teachers write a poll. Students vote once. Both versions run side by side in my local Canvas.</p>
+      <p class="lede">Teachers write a poll. Students vote once. Both versions run side by side in
+        my local Canvas.</p>
       <div class="demo" id="demo" data-gap="2600">
         <ol class="demo-steps">
-          <li><button type="button" class="dstep on" data-i="0"><span class="dn">1</span><span><b>Teacher writes a poll</b><small>A question and the options, then Create Poll</small></span></button></li>
-          <li><button type="button" class="dstep" data-i="1"><span class="dn">2</span><span><b>Student votes</b><small>One choice, one Vote button</small></span></button></li>
-          <li><button type="button" class="dstep" data-i="2"><span class="dn">3</span><span><b>Results appear</b><small>You see your vote and the counts. A second vote is refused.</small></span></button></li>
+          <li><button type="button" class="dstep on" data-i="0"><span
+                class="dn">1</span><span><b>Teacher writes a poll</b><small>A question and the
+                  options, then Create Poll</small></span></button></li>
+          <li><button type="button" class="dstep" data-i="1"><span
+                class="dn">2</span><span><b>Student votes</b><small>One choice, one Vote
+                  button</small></span></button></li>
+          <li><button type="button" class="dstep" data-i="2"><span
+                class="dn">3</span><span><b>Results appear</b><small>You see your vote and the
+                  counts. A second vote is refused.</small></span></button></li>
         </ol>
         <div class="stage" title="Click to go to the next screen">
-          <img class="on" src="hackweek-demo-img/1-teacher-new-poll.png" alt="The QuickPoll 1.3 page in Canvas as a teacher: a New poll form with a question and three options.">
-          <img src="hackweek-demo-img/2-student-vote.png" alt="The QuickPoll 1.3 page in Canvas as a student: the question Which day should we hold the quiz, with three choices and a Vote button.">
-          <img src="hackweek-demo-img/3-student-results.png" alt="The QuickPoll 1.3 page in Canvas after voting: You voted Thursday, with the counts for each option.">
+          <img class="on" src="hackweek-demo-img/1-teacher-new-poll.png"
+            alt="The QuickPoll 1.3 page in Canvas as a teacher: a New poll form with a question and three options.">
+          <img src="hackweek-demo-img/2-student-vote.png"
+            alt="The QuickPoll 1.3 page in Canvas as a student: the question Which day should we hold the quiz, with three choices and a Vote button.">
+          <img src="hackweek-demo-img/3-student-results.png"
+            alt="The QuickPoll 1.3 page in Canvas after voting: You voted Thursday, with the counts for each option.">
         </div>
       </div>
-      <p class="hint" style="margin-top:10px;">Screens from the 1.3 version, in a local Canvas with test users.</p>
+      <p class="hint" style="margin-top:10px;">Screens from the 1.3 version, in a local Canvas with
+        test users.</p>
       <div class="script" aria-label="Speaker script">
         <div class="meta"><span>Say (about 8 s)</span><span class="pace"></span></div>
-        <p>QuickPoll: a teacher posts a poll in Canvas, and students vote once and see the results.</p>
+        <p>QuickPoll: a teacher posts a poll in Canvas, and students vote once and see the results.
+        </p>
       </div>
     </div>
   </section>
@@ -1188,7 +1314,8 @@
       </div>
       <div class="script" aria-label="Speaker script">
         <div class="meta"><span>Say (about 12 s)</span><span class="pace"></span></div>
-        <p>The big difference is the launch. 1.1 sends one form, signed with a shared secret. 1.3 sends a signed token, checked with Canvas's public key.</p>
+        <p>The big difference is the launch. 1.1 sends one form, signed with a shared secret. 1.3
+          sends a signed token, checked with Canvas's public key.</p>
       </div>
     </div>
   </section>
@@ -1308,7 +1435,8 @@
       <p class="hint">Click the diagram to replay the steps.</p>
       <div class="script" aria-label="Speaker script">
         <div class="meta"><span>Say (about 9 s)</span><span class="pace"></span></div>
-        <p>In 1.1, Canvas signs one form with the shared secret. The browser posts it, and my tool re-checks the signature.</p>
+        <p>In 1.1, Canvas signs one form with the shared secret. The browser posts it, and my tool
+          re-checks the signature.</p>
       </div>
     </div>
   </section>
@@ -1430,7 +1558,9 @@
       <p class="hint">Click the diagram to replay the steps.</p>
       <div class="script" aria-label="Speaker script">
         <div class="meta"><span>Say (about 15 s)</span><span class="pace"></span></div>
-        <p>Here's one real 1.3 launch. Canvas starts the login. My tool saves a nonce and sends the browser back. Canvas signs a token and posts it. My tool downloads Canvas's public keys and checks it.</p>
+        <p>Here's one real 1.3 launch. Canvas starts the login. My tool saves a nonce and sends the
+          browser back. Canvas signs a token and posts it. My tool downloads Canvas's public keys
+          and checks it.</p>
       </div>
     </div>
   </section>
@@ -1476,7 +1606,7 @@
       var tot = document.getElementById('b6').querySelector('.meta');
       if (tot) {
         var t = document.createElement('span');
-        var totalSec = beats.reduce(function (n, b) { return n + Number(b.dataset.sec); }, 0);
+        var totalSec = beats.reduce((n, b) => n + Number(b.dataset.sec), 0);
         t.textContent = 'Whole script: ' + totalWords + ' words in ' + totalSec + ' s. Calm pace is about 2.3 words/s, so aim for ' + Math.round(totalSec * 2.3) + ' or fewer.';
         tot.appendChild(t);
       }
@@ -1546,38 +1676,38 @@
       });
 
       // Beat 2: step through the three screenshots while the beat is on screen.
-  (function () {
-    var demo = document.getElementById('demo');
-    if (!demo) return;
-    var imgs = Array.prototype.slice.call(demo.querySelectorAll('.stage img'));
-    var btns = Array.prototype.slice.call(demo.querySelectorAll('.dstep'));
-    var gap = Number(demo.dataset.gap) || 2600;
-    var timers3 = [], seen = false;
-    function show(n) {
-      imgs.forEach(function (im, k) { im.classList.toggle('on', k === n); });
-      btns.forEach(function (b, k) { b.classList.toggle('on', k === n); });
-    }
-    function cur() { return imgs.findIndex(function (im) { return im.classList.contains('on'); }); }
-    function stop() { timers3.forEach(clearTimeout); timers3 = []; }
-    function play() {
-      stop(); show(0);
-      for (var k = 1; k < imgs.length; k++) {
-        (function (n) { timers3.push(setTimeout(function () { show(n); }, n * gap)); })(k);
-      }
-    }
-    btns.forEach(function (b) { b.addEventListener('click', function () { stop(); show(Number(b.dataset.i)); }); });
-    demo.querySelector('.stage').addEventListener('click', function () { stop(); show((cur() + 1) % imgs.length); });
-    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) {
-          if (e.isIntersecting && !seen) { seen = true; play(); }
-          else if (!e.isIntersecting) { seen = false; stop(); show(0); }
-        });
-      }, { threshold: 0.3 }).observe(document.getElementById('b2'));
-    }
-  })();
+      (() => {
+        var demo = document.getElementById('demo');
+        if (!demo) return;
+        var imgs = Array.prototype.slice.call(demo.querySelectorAll('.stage img'));
+        var btns = Array.prototype.slice.call(demo.querySelectorAll('.dstep'));
+        var gap = Number(demo.dataset.gap) || 2600;
+        var timers3 = [], seen = false;
+        function show(n) {
+          imgs.forEach((im, k) => { im.classList.toggle('on', k === n); });
+          btns.forEach((b, k) => { b.classList.toggle('on', k === n); });
+        }
+        function cur() { return imgs.findIndex((im) => im.classList.contains('on')); }
+        function stop() { timers3.forEach(clearTimeout); timers3 = []; }
+        function play() {
+          stop(); show(0);
+          for (var k = 1; k < imgs.length; k++) {
+            ((n) => { timers3.push(setTimeout(() => { show(n); }, n * gap)); })(k);
+          }
+        }
+        btns.forEach((b) => { b.addEventListener('click', () => { stop(); show(Number(b.dataset.i)); }); });
+        demo.querySelector('.stage').addEventListener('click', () => { stop(); show((cur() + 1) % imgs.length); });
+        if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          new IntersectionObserver((entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting && !seen) { seen = true; play(); }
+              else if (!e.isIntersecting) { seen = false; stop(); show(0); }
+            });
+          }, { threshold: 0.3 }).observe(document.getElementById('b2'));
+        }
+      })();
 
-  // Launch diagrams: reveal the steps one at a time when their beat comes into view.
+      // Launch diagrams: reveal the steps one at a time when their beat comes into view.
       if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         Array.prototype.slice.call(document.querySelectorAll('figure.seq')).forEach((seq) => {
           var steps = Array.prototype.slice.call(seq.querySelectorAll('.st'));
